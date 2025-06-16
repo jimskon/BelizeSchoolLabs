@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+
 require('dotenv').config();
 
 const app = express();
@@ -21,6 +23,21 @@ app.get('/api/test-db', async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
+
+// Serve static files from the client/dist directory
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+// Fallback route for React Router
+const indexPath = path.join(__dirname, '../client/dist/index.html');
+/*app.get('*', (req, res) => {
+  res.sendFile(indexPath, function (err) {
+    if (err) {
+      console.error('Error sending index.html:', err);
+      res.status(500).send('Failed to load frontend.');
+    }
+  });
+});*/
 
 const PORT = process.env.PORT || 5000;
 const HOST = '0.0.0.0';
