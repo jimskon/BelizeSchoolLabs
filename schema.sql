@@ -99,10 +99,7 @@ CREATE TABLE moe_school_info (
 );
 
 
--- School information as proveded by the MOE and potentially updated by the Organizational person.
-Add commentMore actions
 -- Table to store individual school information
-
 CREATE TABLE school (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(80), -- Name for this school
@@ -115,23 +112,9 @@ CREATE TABLE school (
 
 
 -- School information as proveded by the MOE and potentially updated by the Organizational person.
-
 CREATE TABLE school_info (
     id INT PRIMARY KEY AUTO_INCREMENT,
     school_id INT,
-    moe_name VARCHAR(80), -- This is the name of the school from the latest MOE load
-    name VARCHAR(80), -- This is the name of the school from the latest moe load - and changed by principal
-    code VARCHAR(10), -- MOE's code for each school
-    address VARCHAR(80), -- School's main address
-    principal VARCHAR(50), -- School's principal
-@@ -86,7 +69,6 @@ CREATE TABLE school_info (
-    verified_at DATETIME,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (school_id) REFERENCES school(id)
-);
-CREATE TABLE school_info (
-    id INT PRIMARY KEY AUTO_INCREMENT,
     moe_name VARCHAR(80), -- This is the name of the school from the latest MOE load
     name VARCHAR(80), -- This is the name of the school from the latest moe load - and corrected by the principal
     code VARCHAR(10), -- MOE's code for each school
@@ -158,7 +141,8 @@ CREATE TABLE school_info (
     admin_comments TEXT,
     verified_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (school_id) REFERENCES school(id)
 );
 
 -- Table which stores the demographics of the schools
