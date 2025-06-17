@@ -1,16 +1,18 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ValidateSchoolPage from './pages/ValidateSchoolPage.jsx';
+import ValidateSchoolPage from './pages/ValidateSchoolPage';
+import BootstrapLayout from './components/BootstrapLayout';
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<ValidateSchoolPage />} />
-      </Routes>
+      <BootstrapLayout>
+        <Routes>
+          <Route path="/" element={<ValidateSchoolPage />} />
+          {/* Add other routes here */}
+        </Routes>
+      </BootstrapLayout>
     </Router>
   );
 }
 
 export default App;
-
