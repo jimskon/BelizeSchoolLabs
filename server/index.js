@@ -1,3 +1,4 @@
+// server/index.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -10,8 +11,10 @@ app.use(express.json());
 
 // All routes prefixed with /api/
 app.use('/api/school', require('./school/routes'));
-app.use('/api/organization', require('./organization/routes'));
-app.use('/api/user', require('./user/routes'));
+app.use('/api/auth', require('./auth/routes'));
+app.use('/api/request', require('./request/routes'));
+
+
 
 // Optional test route
 app.get('/api/test-db', async (req, res) => {
