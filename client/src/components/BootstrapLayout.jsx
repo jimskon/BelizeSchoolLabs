@@ -1,16 +1,14 @@
 // client/src/components/BootstrapLayout.jsx
 import React from 'react';
 import NavBar from './NavBar';
-import { Container } from 'react-bootstrap';
 
 export default function BootstrapLayout({ children }) {
   return (
-    <>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <NavBar />
-      <Container className="mt-4">
+      <main className="flex-grow-1 p-4">
         {children}
-      </Container>
-    </>
+      </main>
+    </div>
   );
 }
-

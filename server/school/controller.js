@@ -1,9 +1,10 @@
+// source/school/controller.js
 const pool = require('../db');
 const { generateMnemonicPassword } = require('../utils/password');
 
 exports.getMoeSchools = async (req, res) => {
-    const [rows] = await pool.query('SELECT name FROM moe_school_info ORDER BY name');
-    // console.log("SCHOOLS:",rows);
+const [rows] = await pool.query('SELECT name, district FROM moe_school_info ORDER BY name');
+    //console.log("SCHOOLS:",rows);
   res.json(rows);
 };
 
