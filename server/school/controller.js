@@ -3,7 +3,7 @@ const { generateMnemonicPassword } = require('../utils/password');
 
 exports.getMoeSchools = async (req, res) => {
     const [rows] = await pool.query('SELECT name FROM moe_school_info ORDER BY name');
-    console.log("SCHOOLS:",rows);
+    // console.log("SCHOOLS:",rows);
   res.json(rows);
 };
 
