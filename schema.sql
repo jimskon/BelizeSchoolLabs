@@ -1,118 +1,71 @@
 -- Belize School Survey & Grant Request Schema
 
+/*
+Process for reading MOE spreadsheet and getting it into the MySQL moe_school_info table
+
+Convert MOE xlsx file into LibreCalc ODS file.
+	Remove all columns except in the following order: 
+		Name	
+		Code
+		Address	
+		Contact Person	
+		Telephone	-  These needs hand editing
+		Telephone_Alt1	
+		Telephone_Alt2	
+		Email	
+		Website	
+		Year Opened	
+		Longitude	- can't be blank put a 0 in
+		Latitude	- can't be blank put a 0 in
+		Area Administrative	Locality	- This becomes 'district' in sql
+		Type	
+		Ownership	
+		Sector	
+		School Administrator 1	
+		School Administrator 2
+
+	Manually correct each cell especially phone numbers
+	Change bad longitude and lattitude values to 0
+	
+	For each tab do a SaveAs... with the name 
+				Dir-2025-Preschool
+				Dir-2025-Primary
+				Dir-2025-Secondary
+				Dir-2025-Tertiary
+				Dir-2025-Vocational
+				Dir-2025-AdultContinuing
+				Dir-2025-University
+	  	Text CSV
+		Click Edit File Settings
+		Field delimiter ;
+		String delimiter "
+		Click Save cell content as shown
+		All else NOT clicked
+
+    Load the schema.db into phpmyadmin
+
+	sudo mysql
+		USE Belize_Project;
+		WARNINGS;
+		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Preschool.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Primary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Secondary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Tertiary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Vocational.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-AdultContinuing.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-University.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+
+
+	 Set created_at which by inference sets updated_at	
+
+      UPDATE `moe_school_info` SET created_at = CURRENT_TIMESTAMP;
+*/
+
 -- Drop old and Create the database if it doesn't exist
 
 DROP DATABASE IF EXISTS Belize_Project;
 CREATE DATABASE IF NOT EXISTS Belize_Project;
 USE Belize_Project;
-
--- Table to store information about any organizations (district, management or school)
-
-CREATE TABLE organization (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    type ENUM ('district', 'management', 'local_management', 'school'),
-    name VARCHAR(80),  -- name of organization
-    address VARCHAR(80),
-    person VARCHAR(50),
-    phone VARCHAR(20),
-    email VARCHAR(50),
-    web_page VARCHAR(100),
-    facebook_page VARCHAR(100),
-    password VARCHAR(50),  -- password need to add/edit this information. 'name' is the username
-    comments TEXT,
-    admin_comments TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Table to store staff details (principals, teachers, managers, district representative)
-
-CREATE TABLE staff (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    organization_id INT,
-    role VARCHAR(50),
-    experience TEXT,
-    resume_file_path VARCHAR(255),
-    comments TEXT,
-    admin_comments TEXT,
-    approved_for_advertising BOOLEAN,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (organization_id) REFERENCES organization(id)
-);
-
--- Table to store information about districts
-
-CREATE TABLE district (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    organization_id INT,
-    -- filler_unique_to_district VARCHAR(50),
-    comments TEXT,
-    admin_comments TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (organization_id) REFERENCES organization(id)
-);
-
--- Table to store management information
-
-CREATE TABLE management (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    organization_id INT,
-    -- filler_unique_to_management VARCHAR(50),
-    comments TEXT,
-    admin_comments TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (organization_id) REFERENCES organization(id)
-);
-
--- Table to store local management information
-
-CREATE TABLE local_management (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    organization_id INT,
-    -- filler_unique_to_local_management VARCHAR(50),
-    comments TEXT,
-    admin_comments TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (organization_id) REFERENCES organization(id)
-);
-
--- Table to store individual school information
-
-CREATE TABLE school (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    organization_id INT,
-    district_id INT,
-    management_id INT,
-    local_management_id INT,
-    comments TEXT,
-    admin_comments TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (organization_id) REFERENCES organization(id),
-    FOREIGN KEY (district_id) REFERENCES district(id),
-    FOREIGN KEY (management_id) REFERENCES management(id),
-    FOREIGN KEY (local_management_id) REFERENCES local_management(id)
-);
-
--- Table to store current grant status - filled in by administrator
-
-CREATE TABLE school_grant_status (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    school_id INT,
-    status ENUM ('more info needed', 'pending_phone_call', 'pending site visit', 'pending final approval', 'approved for advertising', 'granted', 'pending shipment', 'pending installation', 'installed'),
-    number_of_computers INT,
-    type_of_computers VARCHAR(50),
-    number_of_ethernet_switches INT,
-    comments TEXT,
-    admin_comments TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (school_id) REFERENCES school(id)
-);
 
 -- School information as proveded by the MOE DO NOT ALLOW UPDATES
 --   From MOE XLS file, Edit by Hand, Export to CSV, Import into this table, Run SQL to prime 
@@ -120,23 +73,21 @@ CREATE TABLE school_grant_status (
 
 CREATE TABLE moe_school_info (
     name VARCHAR(80) PRIMARY KEY, -- This table is floating out there and does not have a pointer to the school
-    giga_name VARCHAR(80), -- Name that Giga gave this school
-    giga_code VARCHAR(10), -- Giga's code for this school
-    code VARCHAR(10), -- MOE's code for each school
+    code VARCHAR(10), -- MOE's code for this school
     address VARCHAR(80), -- School's main address
     contact_person VARCHAR(50), -- School's contact person (typically the principal)
     telephone VARCHAR(20), -- School's contact person's phone number
     telephone_alt1 VARCHAR(20), -- Alternative school phone number
     telephone_alt2 VARCHAR(20), -- Alternative school phone number
     email VARCHAR(50), -- School's email address
-    website	VARCHAR(50), -- Schools Web Site (optional)
+    website VARCHAR(50), -- Schools Web Site (optional)
     year_opened INT, -- Year the school opened
     longitude FLOAT, -- Longitude of school building
     latitude FLOAT, -- Latitude of school building
 
             -- The following ENUMs are to flag and filter out bad data at SQL import time
     district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
-    locality ENUM ('Rural','Urban','Other'),
+    locality ENUM ('Rural','Urban'),
     type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
     ownership VARCHAR(50), -- 
     sector ENUM ('Government', 'Government Aided', 'Private','Specially Assisted'),
@@ -147,28 +98,28 @@ CREATE TABLE moe_school_info (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+
 -- School information as proveded by the MOE and potentially updated by the Organizational person.
 
-CREATE TABLE school_info (
+CREATE TABLE school (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    school_id INT,
     moe_name VARCHAR(80), -- This is the name of the school from the latest MOE load
-    name VARCHAR(80), -- This is the name of the school from the latest moe load - and changed by principal
+    name VARCHAR(80), -- This is the name of the school from the latest moe load - and corrected by the principal
     code VARCHAR(10), -- MOE's code for each school
     address VARCHAR(80), -- School's main address
-    contact_person VARCHAR(50), -- School's contact person (typically the principal)
-    telephone VARCHAR(20), -- School's contact person's phone number
-    telephone_alt1 VARCHAR(20), -- Alternative school phone number
-    telephone_alt2 VARCHAR(20), -- Alternative school phone number
-    moe_email VARCHAR(50), -- School's email address from MOE load
-    email VARCHAR(50), -- School's email address
+    principal VARCHAR(50), -- School's principal
+    telephone VARCHAR(20), -- School's principal's phone number
+    telephone_alt1 VARCHAR(20), -- Alternate school phone number
+    telephone_alt2 VARCHAR(20), -- Alternate school phone number
+    moe_email VARCHAR(50), -- email address from MOE load
+    email VARCHAR(50), -- Principal's email address
+    email_alt VARCHAR(50), -- Alternate e-mail (probably the main school email)
     website	VARCHAR(50), -- Schools Web Site (optional)
     year_opened INT, -- Year the school opened
     longitude FLOAT, -- Longitude of school building
     latitude FLOAT, -- Latitude of school building
-
     district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
-    locality ENUM ('Rural','Urban','Other'),
+    locality ENUM ('Rural','Urban'),
     type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
     ownership VARCHAR(50), -- 
     sector ENUM ('Government', 'Government Aided', 'Private','Specially Assisted'),
@@ -178,8 +129,7 @@ CREATE TABLE school_info (
     admin_comments TEXT,
     verified_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (school_id) REFERENCES school(id)
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Table which stores the demographics of the schools
@@ -270,7 +220,7 @@ CREATE TABLE computerRoom (
     windows_secure BOOLEAN, -- Are all the windows removed and blocked, or have strong burglar bars installed?
     lighting BOOLEAN, -- Is the lighting in your computer room sufficient (even when all windows are blocked)?
     location BOOLEAN, -- Is your computer room located at the end of your building (i.e. with 3 outside walls)?
-    location_foor BOOLEAN, -- Is your computer room located on the first floor?
+    location_floor BOOLEAN, -- Is your computer room located on the first floor?
     comments TEXT,
     admin_comments TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -309,12 +259,102 @@ CREATE TABLE resources (
     FOREIGN KEY (school_id) REFERENCES school(id)
 );
 
+-- Table to store pictures uploaded by schools
+
+CREATE TABLE pictures (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    category VARCHAR(50), -- such as 'school_building', 'lab', 'resources', 'students', 'events', 'district_map', 'management_map', 'other'
+    description TEXT,
+    file_url VARCHAR(50),
+    file_type VARCHAR(50),
+    approved_for_adver BOOLEAN, -- Set by the administrator
+    comments TEXT,
+    admin_comments TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Table to store current grant status - filled in by administrator
+
+CREATE TABLE school_grant_status (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    school_id INT,
+    status ENUM ('more info needed', 'pending_phone_call', 'pending site visit', 'pending final approval', 'approved for advertising', 'granted', 'pending shipment', 'pending installation', 'installed'),
+    number_of_computers INT,
+    type_of_computers VARCHAR(50),
+    number_of_ethernet_switches INT,
+    comments TEXT,
+    admin_comments TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (school_id) REFERENCES school(id)
+);
+
+/*
+-- Table to store information about the MOE district manager
+
+CREATE TABLE district (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(80),  -- name of district ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo')
+    person VARCHAR(50), -- manager name
+    phone VARCHAR(20), -- manager phone
+    email VARCHAR(50),
+    website VARCHAR(100),
+    facebook VARCHAR(100),
+    password VARCHAR(50),  -- password need to add/edit this information. 'name' is the username
+    comments TEXT,
+    admin_comments TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Table to store information about the ownership (ie. Nazareene, Baptist, etc.)
+
+CREATE TABLE management (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(80),  -- name of management
+    person VARCHAR(50),
+    phone VARCHAR(20),
+    email VARCHAR(50),
+    website VARCHAR(100),
+    facebook VARCHAR(100),
+    password VARCHAR(50),  -- password need to add/edit this information. 'name' is the username
+    comments TEXT,
+    admin_comments TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+-- Table to store staff details (teachers, managers, district representative)
+
+CREATE TABLE school_staff (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    school_id INT,
+    person VARCHAR(50), -- name of staff person
+    phone VARCHAR(20),
+    email VARCHAR(50),
+    website VARCHAR(100),
+    facebook VARCHAR(100),
+    password VARCHAR(50),  -- password need to add/edit this information. 'name' is the username
+    role VARCHAR(50),
+    experience TEXT,
+    resume_file_path VARCHAR(255),
+    comments TEXT,
+    admin_comments TEXT,
+    approved_for_advertising BOOLEAN,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (school_id) REFERENCES school(id)
+);
+
 -- WE DON'T USE THIS TABLE YET - FOR SOME TIME IN FUTURE --
 -- Table for managing staff laptops
 
-CREATE TABLE laptop (
+CREATE TABLE school_staff_laptop (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    staff_id INT,
+    school_staff_id INT,
+    school_id INT,
     brand VARCHAR(50),
     model VARCHAR(50),
     issued_at DATE,
@@ -325,23 +365,7 @@ CREATE TABLE laptop (
     admin_comments TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (staff_id) REFERENCES staff(id)
+    FOREIGN KEY (school_staff_id) REFERENCES school_staff(id),
+    FOREIGN KEY (school_id) REFERENCES school(id)
 );
-
--- Table to store pictures uploaded by schools
-
-CREATE TABLE pictures (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    organization_id INT,
-    category VARCHAR(50), -- such as 'school_building', 'lab', 'resources', 'students', 'events', 'district_map', 'management_map', 'other'
-    description TEXT,
-    file_url VARCHAR(50),
-    file_type VARCHAR(50),
-    approved_for_adver BOOLEAN, -- Set by the administrator
-    comments TEXT,
-    admin_comments TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (organization_id) REFERENCES organization(id)
-);
-
+*/
