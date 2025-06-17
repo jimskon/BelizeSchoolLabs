@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS Belize_Project;
-CREATE DATABASE IF NOT EXISTS Belize_Project;
-USE Belize_Project;
+DROP DATABASE IF EXISTS belize_db;
+CREATE DATABASE IF NOT EXISTS belize_db;
+USE belize_db;
 
 -- School information as proveded by the MOE DO NOT ALLOW UPDATES
 --   From MOE XLS file, Edit by Hand, Export to CSV, Import into this table, Run SQL to prime 
