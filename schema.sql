@@ -290,6 +290,27 @@ CREATE TABLE school_grant_status (
     FOREIGN KEY (school_id) REFERENCES school(id)
 );
 
+CREATE TABLE account_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  school_name VARCHAR(255) NOT NULL,
+  code VARCHAR(10),
+  school_address VARCHAR(255),
+  district VARCHAR(100),
+
+  contact_name VARCHAR(100),
+  contact_email VARCHAR(255),
+  contact_phone VARCHAR(50),
+
+  school_phone VARCHAR(50),
+  school_email VARCHAR(255),
+
+  status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+  requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  reviewed_at DATETIME NULL
+
+
+);
+
 /*
 -- Table to store information about the MOE district manager
 
