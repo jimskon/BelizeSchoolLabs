@@ -104,6 +104,7 @@ CREATE TABLE school (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(80), -- Name for this school
     code VARCHAR(10), -- MOE's code for this school
+    password VARCHAR(255),          -- Generated password sent to MOE email
     comments TEXT,
     admin_comments TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
