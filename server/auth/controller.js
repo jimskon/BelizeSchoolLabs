@@ -1,3 +1,4 @@
+// server/auth/controller.js
 const db = require('../db'); // Adjust path as needed
 const { sendEmail } = require('../utils/email'); // Utility to send email
 const bcrypt = require('bcrypt');
@@ -13,20 +14,20 @@ exports.login = async (req, res) => {
     console.log('Login attempt - password:', password);
 
     const [[schoolRow]] = await db.query(
-  'SELECT * FROM school WHERE name = ?',
-  [name]
-);
+      'SELECT * FROM school WHERE name = ?',
+      [name]
+    );
 
-if (!schoolRow) {
-  return res.json({ success: false, error: 'Invalid credentials' });
-}
+    if (!schoolRow) {
+      return res.json({ success: false, error: 'Invalid credentials' });
+    }
 
-// Compare input password with hashed password
-const passwordMatches = await bcrypt.compare(password, schoolRow.password);
+    // Compare input password with hashed password
+    const passwordMatches = await bcrypt.compare(password, schoolRow.password);
 
-if (!passwordMatches) {
-  return res.json({ success: false, error: 'Invalid credentials' });
-}
+    if (!passwordMatches) {
+      return res.json({ success: false, error: 'Invalid credentials' });
+    }
 
     if (!schoolRow) {
       console.log('Login failed: No match');
@@ -43,7 +44,7 @@ if (!passwordMatches) {
 
     res.json({
       success: true,
-      school: schoolRow,
+      name: schoolRow.name,  
       needsValidation
     });
   } catch (err) {
@@ -93,8 +94,8 @@ exports.sendPasswordEmail = async (req, res) => {
     }
 
     // Step 4: Generate password
-      const generatedPassword = generateReadablePassword();
-      const hashedPassword = await bcrypt.hash(generatedPassword, 10);  // 10 = salt rounds
+    const generatedPassword = generateReadablePassword();
+    const hashedPassword = await bcrypt.hash(generatedPassword, 10);  // 10 = salt rounds
 
     // Step 5: Insert or update school record
     const [[existingSchool]] = await db.query(

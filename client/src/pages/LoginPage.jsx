@@ -26,7 +26,7 @@ export default function LoginPage() {
     const data = await res.json();
     if (res.ok && data.success) {
       if (data.needsValidation) {
-        navigate('/validate');
+        navigate(`/validate?name=${encodeURIComponent(data.name)}`);
       } else {
         navigate('/main');
       }

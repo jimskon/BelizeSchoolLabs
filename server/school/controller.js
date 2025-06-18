@@ -1,6 +1,5 @@
 // source/school/controller.js
 const pool = require('../db');
-const { generateMnemonicPassword } = require('../utils/password');
 
 exports.getMoeSchools = async (req, res) => {
 const [rows] = await pool.query('SELECT name, district FROM moe_school_info ORDER BY name');
@@ -22,42 +21,102 @@ exports.validateAndCreateSchool = async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // Step 1: Create mnemonic password
-    const password = generateMnemonicPassword();
-
-    // Step 2: Create organization
-    const [orgResult] = await conn.query(`
-      INSERT INTO organization (type, name, address, person, phone, email, password)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ['school', data.name, data.address, data.contact_person, data.telephone, data.email, password]
-    );
-
-    const orgId = orgResult.insertId;
-
-    // Step 3: Create school
+    // Step 1: Create school
     const [schoolResult] = await conn.query(`
-      INSERT INTO school (organization_id)
-      VALUES (?)`, [orgId]
+      INSERT INTO school (name, code)
+      VALUES (?, ?)`,
+      [data.name, data.code]
     );
 
     const schoolId = schoolResult.insertId;
 
-    // Step 4: Create school_info
+    // Step 2: Create school_info
     await conn.query(`
-      INSERT INTO school_info (school_id, moe_name, name, code, address, contact_person, telephone, email,
-        district, locality, type, sector, ownership, verified_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-      [schoolId, data.name, data.name, data.code, data.address, data.contact_person, data.telephone,
-        data.email, data.district, data.locality, data.type, data.sector, data.ownership]
-    );
+      INSERT INTO school_info (
+        school_id, moe_name, name, code, address, principal,
+        telephone, telephone_alt1, telephone_alt2,
+        moe_email, email, email_alt, website,
+        year_opened, longitude, latitude,
+        district, locality, type, sector, ownership,
+        school_administrator_1, school_administrator_2,
+        comments, admin_comments,
+        verified_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    `, [
+      schoolId,
+      data.moe_name || data.name,
+      data.name,
+      data.code,
+      data.address || '',
+      data.contact_person || '',
+      data.telephone || '',
+      data.telephone_alt1 || '',
+      data.telephone_alt2 || '',
+      data.moe_email || '',
+      data.email || '',
+      data.email_alt || '',
+      data.website || '',
+      data.year_opened || null,
+      data.longitude || null,
+      data.latitude || null,
+      data.district || '',
+      data.locality || '',
+      data.type || '',
+      data.sector || '',
+      data.ownership || '',
+      data.school_administrator_1 || '',
+      data.school_administrator_2 || '',
+      data.comments || '',
+      data.admin_comments || ''
+    ]);
 
     await conn.commit();
-    res.json({ success: true, password });
+    res.json({ success: true });
   } catch (err) {
     await conn.rollback();
-    console.error(err);
+    console.error('Validation error:', err);
     res.status(500).json({ success: false, error: err.message });
   } finally {
     conn.release();
+  }
+};
+
+exports.getValidationPrefillData = async (req, res) => {
+  const schoolName = req.query.name;
+
+  try {
+    const [[moeRow]] = await pool.query(
+      'SELECT * FROM moe_school_info WHERE name = ?',
+      [schoolName]
+    );
+
+    if (!moeRow) {
+      return res.status(404).json({ error: 'MOE school not found' });
+    }
+
+    res.json({
+      moe_name: moeRow.name,
+      name: moeRow.name,
+      code: moeRow.code,
+      address: moeRow.address,
+      contact_person: moeRow.contact_person || moeRow.school_Administrator_1 || '',
+      telephone: moeRow.telephone || '',
+      telephone_alt1: moeRow.telephone_alt1 || '',
+      telephone_alt2: moeRow.telephone_alt2 || '',
+      email: moeRow.email || '',
+      email_alt: '',
+      website: moeRow.website || '',
+      year_opened: moeRow.year_opened || null,
+      district: moeRow.district || '',
+      locality: moeRow.locality || '',
+      type: moeRow.type || '',
+      sector: moeRow.sector || '',
+      ownership: moeRow.ownership || '',
+      school_administrator_1: moeRow.school_Administrator_1 || '',
+      school_administrator_2: moeRow.school_Administrator_2 || '',
+    });
+  } catch (err) {
+    console.error('Prefill fetch error:', err);
+    res.status(500).json({ error: 'Failed to load prefill data' });
   }
 };
