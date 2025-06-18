@@ -49,3 +49,47 @@ exports.getRequests = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+const { sendEmail } = require('../utils/email');
+const crypto = require('crypto');
+
+exports.requestAccount = async (req, res) => {
+  const {
+    schoolName, district, email, phone, address,
+    manager, managerEmail, managerPhone
+  } = req.body;
+
+  // Step 1: Generate a random password
+  const generatedPassword = crypto.randomBytes(4).toString('hex'); // e.g., 'a7b9c2d3'
+
+  try {
+    // Step 2: Insert into school table (this is the official account)
+    await db.query(
+      `INSERT INTO school (name, district, email, phone, address, password)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [schoolName, district, email, phone, address, generatedPassword]
+    );
+
+    // Optional: track this in account_requests too
+    await db.query(
+      `INSERT INTO account_requests
+      (school_name, district, school_email, school_phone, school_address,
+       manager_name, manager_email, manager_phone, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'approved')`,
+      [schoolName, district, email, phone, address, manager, managerEmail, managerPhone]
+    );
+
+    // Step 3: Send email to school
+    await sendEmail({
+      to: email,
+      subject: 'Your Belize School Labs Account Password',
+      text: `Thank you for registering. Your login password is: ${generatedPassword}`
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Request account error:', err);
+    res.status(500).json({ success: false, error: 'Server error creating account.' });
+  }
+};
+

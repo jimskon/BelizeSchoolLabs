@@ -1,17 +1,22 @@
 const db = require('../db'); // Adjust path as needed
 const { sendEmail } = require('../utils/email'); // Utility to send email
+const crypto = require('crypto');
 
 // Login
 exports.login = async (req, res) => {
-  const { school, password } = req.body;
+  const { name, password } = req.body;
 
   try {
+    console.log('Login attempt - School name:', name);
+    console.log('Login attempt - password:', password);
+
     const [[schoolRow]] = await db.query(
       'SELECT * FROM school WHERE name = ? AND password = ?',
-      [school, password]
+      [name, password]
     );
 
     if (!schoolRow) {
+      console.log('Login failed: No match');
       return res.json({ success: false, error: 'Invalid credentials' });
     }
 
@@ -40,28 +45,78 @@ exports.sendPasswordEmail = async (req, res) => {
   const { school_name } = req.body;
 
   try {
-    const [rows] = await db.query(
-      'SELECT password, moe_email FROM moe_school_info WHERE name = ?',
+    let emailToSend = null;
+    let schoolCode = null;
+
+    // Step 1: Try moe_school_info
+    const [[moeRow]] = await db.query(
+      'SELECT email, code FROM moe_school_info WHERE name = ?',
       [school_name]
     );
 
-    if (rows.length === 0 || !rows[0].moe_email) {
-      return res.json({ success: false, error: 'Email not found for this school' });
+    if (moeRow) {
+      emailToSend = moeRow.email;
+      schoolCode = moeRow.code;
+      console.log(`Using email from moe_school_info: ${emailToSend}`);
     }
 
-    const { password, moe_email } = rows[0];
+    // Step 2: Fallback to school_info
+    if (!emailToSend || !schoolCode) {
+      const [[infoRow]] = await db.query(
+        'SELECT email, code FROM school_info WHERE name = ?',
+        [school_name]
+      );
+
+      if (infoRow) {
+        emailToSend = emailToSend || infoRow.email;
+        schoolCode = schoolCode || infoRow.code;
+        console.log(`Using fallback email/code from school_info: ${emailToSend}, ${schoolCode}`);
+      }
+    }
+
+    // Step 3: Fail if no email or code
+    if (!emailToSend || !schoolCode) {
+      return res.json({ success: false, error: 'Missing email or code for this school' });
+    }
+
+    // Step 4: Generate password
+    const generatedPassword = crypto.randomBytes(4).toString('hex');
+
+    // Step 5: Insert or update school record
+    const [[existingSchool]] = await db.query(
+      'SELECT id FROM school WHERE name = ?',
+      [school_name]
+    );
+
+    if (existingSchool) {
+      await db.query(
+        'UPDATE school SET code = ?, password = ? WHERE id = ?',
+        [schoolCode, generatedPassword, existingSchool.id]
+      );
+      console.log(`Updated password for school ID ${existingSchool.id}`);
+    } else {
+      await db.query(
+        'INSERT INTO school (name, code, password) VALUES (?, ?, ?)',
+        [school_name, schoolCode, generatedPassword]
+      );
+      console.log(`Inserted new school '${school_name}' with code and password`);
+    }
+
+    // Step 6: Send email
     await sendEmail({
-      to: moe_email,
-      subject: 'Your Belize School Labs Account Password',
-      text: `Your login password is: ${password}`
+      to: emailToSend,
+      subject: 'Your Belize School Labs Login Password',
+      text: `Here is your login password: ${generatedPassword}\n\nYou can use it to log in at belizeschoollabs.org`
     });
 
-    res.json({ success: true });
+    res.json({ success: true, message: 'Password sent and stored successfully' });
+
   } catch (err) {
-    console.error('Send email error:', err);
-    res.status(500).json({ success: false, error: 'Failed to send email' });
+    console.error('Send password error:', err);
+    res.status(500).json({ success: false, error: 'Failed to send password' });
   }
 };
+
 
 // Request account manually
 exports.requestAccount = async (req, res) => {
@@ -134,3 +189,5 @@ exports.approveRequest = async (req, res) => {
     res.status(500).json({ success: false, error: 'Approval failed' });
   }
 };
+
+
