@@ -260,6 +260,12 @@ CREATE TABLE account_requests (
 
 );
 
+CREATE TABLE requiredfields (
+    tablename VARCHAR(50) PRIMARY KEY, -- name of the table to check
+    required TEXT NOT NULL              -- comma-separated list of required fields
+);
+
+
 INSERT INTO `moe_school_info` (`name`, `code`, `address`, `contact_person`, `telephone`, `telephone_alt1`, `telephone_alt2`, `email`, `website`, `year_opened`, `longitude`, `latitude`, `district`, `locality`, `type`, `ownership`, `sector`, `school_Administrator_1`, `school_Administrator_2`, `admin_comments`, `created_at`, `updated_at`) VALUES
 ('A to Z Learning Tree Preschool', 'K21011', '2 Mount Mossey, Belmopan', 'Michelle Cano', '610-0270', '', '', 'a2zlearningtreepresch@gmail.com', '', 2010, -88.7616, 17.2588, 'Cayo', 'Urban', 'Preschool', 'Private Schools', 'Private', 'Michelle Cano (Principal)', 'Danielle Cano', NULL, '2025-06-17 10:30:15', '2025-06-17 10:30:15'),
 ('ABC Preschool', 'K11002', 'San Pedro Town, Lion Street, Airstrip Area 1 Angel Lane', 'Wilfredo L Alamilla Jr', '226-3070', '', '', 'abcpreschoolsp@hotmail.com', '', 1979, -87.9654, 17.9175, 'Belize', 'Urban', 'Preschool', 'Private Schools', 'Private', 'Wilfredo L Alamilla Jr', 'Faride Salinas', NULL, '2025-06-17 10:30:15', '2025-06-17 10:30:15'),
