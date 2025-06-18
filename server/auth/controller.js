@@ -1,5 +1,6 @@
 const db = require('../db'); // Adjust path as needed
 const { sendEmail } = require('../utils/email'); // Utility to send email
+const bcrypt = require('bcrypt');
 const { generateReadablePassword } = require('../utils/password');
 
 
@@ -12,9 +13,20 @@ exports.login = async (req, res) => {
     console.log('Login attempt - password:', password);
 
     const [[schoolRow]] = await db.query(
-      'SELECT * FROM school WHERE name = ? AND password = ?',
-      [name, password]
-    );
+  'SELECT * FROM school WHERE name = ?',
+  [name]
+);
+
+if (!schoolRow) {
+  return res.json({ success: false, error: 'Invalid credentials' });
+}
+
+// Compare input password with hashed password
+const passwordMatches = await bcrypt.compare(password, schoolRow.password);
+
+if (!passwordMatches) {
+  return res.json({ success: false, error: 'Invalid credentials' });
+}
 
     if (!schoolRow) {
       console.log('Login failed: No match');
@@ -82,6 +94,7 @@ exports.sendPasswordEmail = async (req, res) => {
 
     // Step 4: Generate password
       const generatedPassword = generateReadablePassword();
+      const hashedPassword = await bcrypt.hash(generatedPassword, 10);  // 10 = salt rounds
 
     // Step 5: Insert or update school record
     const [[existingSchool]] = await db.query(
@@ -92,13 +105,13 @@ exports.sendPasswordEmail = async (req, res) => {
     if (existingSchool) {
       await db.query(
         'UPDATE school SET code = ?, password = ? WHERE id = ?',
-        [schoolCode, generatedPassword, existingSchool.id]
+        [schoolCode, hashedPassword, existingSchool.id]
       );
       console.log(`Updated password for school ID ${existingSchool.id}`);
     } else {
       await db.query(
         'INSERT INTO school (name, code, password) VALUES (?, ?, ?)',
-        [school_name, schoolCode, generatedPassword]
+        [school_name, schoolCode, hashedPassword]
       );
       console.log(`Inserted new school '${school_name}' with code and password`);
     }
