@@ -1,6 +1,7 @@
 const db = require('../db'); // Adjust path as needed
 const { sendEmail } = require('../utils/email'); // Utility to send email
-const crypto = require('crypto');
+const { generateReadablePassword } = require('../utils/password');
+
 
 // Login
 exports.login = async (req, res) => {
@@ -80,7 +81,7 @@ exports.sendPasswordEmail = async (req, res) => {
     }
 
     // Step 4: Generate password
-    const generatedPassword = crypto.randomBytes(4).toString('hex');
+      const generatedPassword = generateReadablePassword();
 
     // Step 5: Insert or update school record
     const [[existingSchool]] = await db.query(
