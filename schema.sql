@@ -4,61 +4,70 @@
 Process for reading MOE spreadsheet and getting it into the MySQL moe_school_info table
 
 Convert MOE xlsx file into LibreCalc ODS file.
-	Remove all columns except in the following order: 
-		Name	
-		Code
-		Address	
-		Contact Person	
-		Telephone	-  These needs hand editing
-		Telephone_Alt1	
-		Telephone_Alt2	
-		Email	
-		Website	
-		Year Opened	
-		Longitude	- can't be blank put a 0 in
-		Latitude	- can't be blank put a 0 in
-		Area Administrative	Locality	- This becomes 'district' in sql
-		Type	
-		Ownership	
-		Sector	
-		School Administrator 1	
-		School Administrator 2
+    Remove all columns except in the following order: 
+        Name    
+        Code
+        Address 
+        Contact Person  
+        Telephone   -  These needs hand editing
+        Telephone_Alt1  
+        Telephone_Alt2  
+        Email   
+        Website 
+        Year Opened 
+        Longitude   - can't be blank put a 0 in
+        Latitude    - can't be blank put a 0 in
+        Area Administrative Locality    - This becomes 'district' in sql
+        Type    
+        Ownership   
+        Sector  
+        School Administrator 1  
+        School Administrator 2
 
-	Manually correct each cell especially phone numbers
-	Change bad longitude and lattitude values to 0
-	
-	For each tab do a SaveAs... with the name 
-				Dir-2025-Preschool
-				Dir-2025-Primary
-				Dir-2025-Secondary
-				Dir-2025-Tertiary
-				Dir-2025-Vocational
-				Dir-2025-AdultContinuing
-				Dir-2025-University
-	  	Text CSV
-		Click Edit File Settings
-		Field delimiter ;
-		String delimiter "
-		Click Save cell content as shown
-		All else NOT clicked
+    Manually correct each cell especially phone numbers
+    Change bad longitude and lattitude values to 0
+    
+    For each tab do a SaveAs... with the name 
+                Dir-2025-Preschool
+                Dir-2025-Primary
+                Dir-2025-Secondary
+                Dir-2025-Tertiary
+                Dir-2025-Vocational
+                Dir-2025-AdultContinuing
+                Dir-2025-University
+        Text CSV
+        Click Edit File Settings
+        Field delimiter ;
+        String delimiter "
+        Click Save cell content as shown
+        All else NOT clicked
 
     Load the schema.db into phpmyadmin
 
-	sudo mysql
-		USE Belize_Project;
-		WARNINGS;
-		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Preschool.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Primary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Secondary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Tertiary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Vocational.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-AdultContinuing.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-		LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-University.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+    sudo mysql
+        USE Belize_Project;
+        WARNINGS;
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Preschool.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Primary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Secondary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Tertiary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Vocational.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-AdultContinuing.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-University.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+
+        Load the additional MOE spreadsheet info Giga Connected Schools and Code Dot Org schools
+
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-GigaConnected.csv' INTO TABLE moe_giga_connected FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-CodeOrg.csv' INTO TABLE moe_code_org FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;        
 
 
-	 Set created_at which by inference sets updated_at	
+        WARNING! - Check each database table to ensure the data is correct. If a cell in the original spread sheet has a CR in it some rows will be screwed up
 
-      UPDATE `moe_school_info` SET created_at = CURRENT_TIMESTAMP;
+        Set created_at which by inference sets updated_at      
+
+        UPDATE `moe_school_info` SET created_at = CURRENT_TIMESTAMP;
+        UPDATE `moe_giga_connected` SET created_at = CURRENT_TIMESTAMP;
+        UPDATE `moe_code_org` SET created_at = CURRENT_TIMESTAMP;        
 */
 
 -- Drop old and Create the database if it doesn't exist
@@ -67,9 +76,41 @@ DROP DATABASE IF EXISTS Belize_Project;
 CREATE DATABASE IF NOT EXISTS Belize_Project;
 USE Belize_Project;
 
--- School information as proveded by the MOE DO NOT ALLOW UPDATES
---   From MOE XLS file, Edit by Hand, Export to CSV, Import into this table, Run SQL to prime 
---   THIS IS A TEMPORARY TABLE THAT WILL MOST LIKELY NOT BE USED BY OUR WEB SITE --
+-- School information as proveded by the MOE - Giga connected schools
+
+CREATE TABLE moe_giga_connected (
+    name VARCHAR(80) PRIMARY KEY, -- This table is floating out there and does not have a pointer to the school
+    address VARCHAR(80), -- School's main address
+    district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
+    contact_person VARCHAR(50), -- School's contact person (typically the principal)
+    telephone VARCHAR(20), -- School's contact person's phone number
+    email VARCHAR(50), -- School's email address
+    contact_person_alt1 VARCHAR(50), -- School's contact person (typically the principal)
+    telephone_alt1 VARCHAR(20), -- School's contact person's phone number
+    email_alt1 VARCHAR(50), -- School's email address
+    email_alt2 VARCHAR(50), -- School's email address
+    admin_comments TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- School information as proveded by the MOE - Code dot Org schools
+
+CREATE TABLE moe_code_org (
+    code VARCHAR(10) PRIMARY KEY, -- MOE's code for this school
+    name VARCHAR(80), -- This table is floating out there and does not have a pointer to the school
+    contact_person VARCHAR(50), -- School's contact person (typically the principal)
+    email VARCHAR(50), -- School's email address
+    email_alt1 VARCHAR(50), -- School's email address alternate 1
+    telephone VARCHAR(20), -- School's contact person's phone number
+    telephone_alt1 VARCHAR(20), -- Alternative school phone number
+    telephone_alt2 VARCHAR(20), -- Alternative school phone number
+    admin_comments TEXT,    
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- School information as proveded by the MOE - Main School spreadsheet (with a bunch of hand edits)
 
 CREATE TABLE moe_school_info (
     name VARCHAR(80) PRIMARY KEY, -- This table is floating out there and does not have a pointer to the school
@@ -99,12 +140,13 @@ CREATE TABLE moe_school_info (
 );
 
 
--- Table to store individual school information
+-- Table to store individual school
 CREATE TABLE school (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(80), -- Name for this school
     code VARCHAR(10), -- MOE's code for this school
-    password VARCHAR(255),          -- Generated password sent to MOE email
+    password VARCHAR(255), -- Generated password sent to MOE email
+    answered_filled_out BOOLEAN,  -- Yes, Have you filled out all the answers; or No, I did not know all the answers I will have someone else help me
     comments TEXT,
     admin_comments TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -112,7 +154,8 @@ CREATE TABLE school (
 );
 
 
--- School information as proveded by the MOE and potentially updated by the Organizational person.
+-- School information as originally proveded by the MOE and potentially updated by the principal etc.
+
 CREATE TABLE school_info (
     id INT PRIMARY KEY AUTO_INCREMENT,
     school_id INT,
