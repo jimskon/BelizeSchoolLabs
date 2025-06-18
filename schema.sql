@@ -368,6 +368,12 @@ CREATE TABLE account_requests (
 
 );
 
+CREATE TABLE requiredfields (
+    tablename VARCHAR(50) PRIMARY KEY, -- name of the table to check
+    required TEXT NOT NULL              -- comma-separated list of required fields
+);
+
+
 /*
 -- Table to store information about the MOE district manager
 
