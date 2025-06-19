@@ -293,13 +293,17 @@ CREATE TABLE curriculum (
 CREATE TABLE computerRoom (
     id INT PRIMARY KEY AUTO_INCREMENT,
     school_id INT,
+
+        --  NOTE: THE FOLLOWING QUESTIONS ONLY ASKED IF THEY HAVE A COMPUTER ROOM
+        demographics.number_of_computer_labs > 0
+
     wired_for_lab BOOLEAN, -- Has your computer room been wired expressly for a computer lab?
     electrical BOOLEAN, -- Does your computer room have a dedicated electrical service panel in the computer room?
     electrical_ground BOOLEAN, -- Is there a quality ground wire connected to a ground rod?
     electrical_outlets INT, -- How many electrical outlets are in the computer room?
     air_condition INT, -- How many working air conditioners does your computer lab have?
     num_of_doors INT, -- How many doors does the computer room have?
-    num_of_doors_secure INT, -- How many doors that have burglar bars does the computer room have?
+    num_of_doors_secure INT, -- How many doors with burglar bars does the computer room have?
     partition_security BOOLEAN, -- Are all 4 walls in your computer room concrete including the partition to the next room?
     ceiling_secure BOOLEAN, -- Is your computer lab ceiling constructed of concrete or steel with no open spaces and secured from a thief climbing over the partitioned wall?
     windows_secure BOOLEAN, -- Are all the windows removed and blocked, or have strong burglar bars installed?
