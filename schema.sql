@@ -275,6 +275,7 @@ CREATE TABLE curriculum (
     robotics BOOLEAN, -- Does your school teach robotics?
     code_dot_org BOOLEAN, -- Does your school use code.org?
     khan_accadamy BOOLEAN, -- Does your school use Khan Academy or similar online learning platforms?
+    edpm BOOLEAN, -- Does your school teach EDPM?
     other_online_local_education_tools VARCHAR(50), -- What other Website tools does your school use or teach?
     formal_curriculum VARCHAR(50), -- What formal computer related curriculum does your school use if any?
     local_curriculum VARCHAR(50), -- What locally generated computer related curriculum does your school use?
