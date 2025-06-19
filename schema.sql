@@ -318,28 +318,44 @@ CREATE TABLE computerRoom (
 
 -- Table to store available and requested resources
 
+
+-- Table to store available and requested resources
+
 CREATE TABLE resources (
     id INT PRIMARY KEY AUTO_INCREMENT,
     school_id INT,
+
+    -- Ask the following if resources.number_of_computer_labs > 0
+
     number_seats INT, -- How many student computer stations can your lab accommodate?
-    desktop_working INT, -- How many working desktop computers does your school have?
-    desktop_not_working INT, -- How many non-working desktops do you have?
+
+    desktop_working INT, --  How many working desktop computers does your main school lab / room have?   
+    desktop_not_working INT, --  How many non-working desktops do you have?  Some people have reported a non-working desktop when the problem 
+    -- has been that the monitor, keyboard or mouse is what is actually broken. Please report here the actual desktop.
+
     desktop_age INT, -- Estimate how old your desktops are in years?
     desktop_ownership INT, -- Approximately how long have you had your desktops in years?
-    desktop_monitors INT, -- How many working monitors do you have?
-    desktop_keyboards INT, -- How many working keyboards do you have?
-    desktop_mice INT, -- How many working mice do you have?
+
+    desktop_monitors INT, -- How many working monitors does your main school lab / room have?
+    desktop_keyboards INT, -- How many working keyboards does your main school lab / room have?
+    desktop_mice INT, -- How many working mice does your main school lab / room have?
     desktop_comments VARCHAR(250), -- Please enter any comments you may have about the reliability and usefulness of your desktop computers.
-    chromebooks_working INT, -- How many working chromebooks do you have?
-    chromebooks_broken INT, -- How many chromebooks broke within their first three years?
+
+    -- End of if resources.number_of_computer_labs > 0
+
+    chromebooks_working INT, -- How many working chromebooks does your school have?
+    chromebooks_broken INT, -- How many chromebooks broke within their first two years?
     chromebooks_lost INT, -- How many chromebooks were lost or stolen in their first two years?
     chromebooks_comments VARCHAR(250), -- Please enter any comments you may have about the reliability and usefulness of the chromebooks.
-    tablets_working INT, -- How many working tablets do you have?
+
+    tablets_working INT, -- How many working tablets does your school have?
     tablets_broken INT, -- How many tablets broke within their first two years?
     tablets_lost INT, -- How many tablets were lost or stolen in their first two years?
     tablets_comments VARCHAR(250), -- Please enter any comments you may have about the reliability and usefulness of your tablets.
+
     old_computers_work VARCHAR(50), -- What do you plan to do with your old computers and tablets that still work?
     old_computers_broken VARCHAR(50), -- What do you plan to do with your broken computers and tablets?
+
     comments TEXT,
     admin_comments TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
