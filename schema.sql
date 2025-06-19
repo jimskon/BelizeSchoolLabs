@@ -294,8 +294,7 @@ CREATE TABLE computerRoom (
     id INT PRIMARY KEY AUTO_INCREMENT,
     school_id INT,
 
-        --  NOTE: THE FOLLOWING QUESTIONS ONLY ASKED IF THEY HAVE A COMPUTER ROOM
-        demographics.number_of_computer_labs > 0
+        --  NOTE: THE FOLLOWING QUESTIONS ONLY ASKED IF THEY HAVE A COMPUTER ROOM; demographics.number_of_computer_labs > 0
 
     wired_for_lab BOOLEAN, -- Has your computer room been wired expressly for a computer lab?
     electrical BOOLEAN, -- Does your computer room have a dedicated electrical service panel in the computer room?
