@@ -150,7 +150,7 @@ CREATE TABLE school (
     comments TEXT,
     admin_comments TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 
@@ -163,7 +163,7 @@ CREATE TABLE school_info (
     name VARCHAR(80), -- This is the name of the school from the latest moe load - and corrected by the principal
     code VARCHAR(10), -- MOE's code for each school
     address VARCHAR(80), -- School's main address
-    principal VARCHAR(50), -- School's principal
+    contact_person VARCHAR(50), -- School's contact person (usually the principal)
     telephone VARCHAR(20), -- School's principal's phone number
     telephone_alt1 VARCHAR(20), -- Alternate school phone number
     telephone_alt2 VARCHAR(20), -- Alternate school phone number
@@ -177,7 +177,9 @@ CREATE TABLE school_info (
     district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
     locality ENUM ('Rural','Urban'),
     type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
-    ownership VARCHAR(50), -- 
+    ownership VARCHAR(50), -- (Advantist Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools, Government Schools,
+    -- Mennonite Schools - Church Group. Mennonite Schools - H&B, Mennonite Schools - Spanish Lookout, Methodist Schools, Nazarene Schools, 
+    -- Presbyterian Schools, Private Schools, U.E.C.B Schools, Other)
     sector ENUM ('Government', 'Government Aided', 'Private','Specially Assisted'),
     school_administrator_1 VARCHAR(50), -- Administrator 1 name
     School_administrator_2 VARCHAR(50), -- Administrator 2 name
@@ -192,37 +194,62 @@ CREATE TABLE school_info (
 -- Table which stores the demographics of the schools
 
 CREATE TABLE demographics (
-    id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     school_id INT,
-    minutes_drive_from_road INT, -- How many minutes drive is your school from the main road?
+    
+    -- Principal section
+
     principals_name VARCHAR(50), -- Principal’s name
-    principals_telephone VARCHAR(50), -- Principal’s phone number
+    principals_telephone VARCHAR(50), -- Principal’s phone number (WhatsApp preferred)
     principals_email VARCHAR(50), -- Principal’s email address
+    schools_email VARCHAR(50), -- School’s email address (optional)
     principals_computer BOOLEAN, -- Does the principal's office have a good working computer that is not rented?
+ 
+    -- Teacher, student, building and classroom section
+
     number_of_students INT, -- Total number of students in your school
-    largest_class_size INT, -- Number of students in your largest class
-    number_of_buildings INT, -- Number of buildings at your school (not including storage buildings)
-    number_of_buildings_with_internet INT, -- Number of buildings with Internet or WiFi
-    number_of_computer_labs INT, -- Number of computer labs
-    internet_provider VARCHAR(50), -- Internet provider (e.g. 'DigiNet', 'NextGen', 'Other')
-    internet_speed_Mbps INT, -- Internet speed in Mbps (e.g. '50', '100', '250', '500', 'Unknown')
-    connection_method VARCHAR(50), -- Internet connection method (‘Fiber’, ‘Wireless ISP’, ‘Other’)
-    internet_stability VARCHAR(50), -- Describe Internet stability when all students are using devices
-    power_stability INT, -- Number of times per week the school’s power goes out
-    has_pta BOOLEAN, -- Does your school have a PTA or group to help with funding?
-    has_technician_to_maintain_computers VARCHAR(50), -- Who can fix computers? (‘no’, ‘teacher’, ‘parent’, etc.)
     number_of_teachers INT, -- Number of teachers (full or part-time)
+    largest_class_size INT,  -- Number of students in your largest classroom
+    number_of_buildings INT, -- Number of buildings at your school (not including storage buildings)
+    number_of_classrooms INT, -- Number of classrooms in your school
+    number_of_computer_labs INT,-- Number of computer labs / rooms in your school (0,1,2,3+)
+    minutes_drive_from_road INT, -- How many minutes drive is your school from the main road?
+    power_stability INT, -- Number of times per week the school’s power goes out (0, 1, 2, 3, 4, 5+)
+    has_pta BOOLEAN, -- Does your school have a PTA or group to help with funding?
+
+   -- Internet Section
+
+    has_internet BOOLEAN, -- Does your school have Internet access (yes, no)
+
+    -- Ask the following if they have internet (if not then force fill the fields with NULL, 0, etc)
+
+    number_of_classrooms_with_internet INT, -- Number of classrooms with Internet or WiFi
+    internet_provider VARCHAR(50), -- Internet provider (e.g. 'DigiNet', 'NextGen', 'Other')
+    internet_speed ENUM ('Don’t know', '10 to 49 Mbps', '50 to 99 Mbps', '100 to 249 Mbps', '250 to 500 Mbps'),  --  Internet speed in Mbps 
+    connection_method VARCHAR(50), -- Internet connection method (‘Fiber’, ‘Cable’, ‘Wireless ISP’, ‘Hot Spot’, ‘Other’),
+    internet_stability ENUM ('Very stable', 'Mostly OK','Comes in and out','Unstable'), -- Describe the Internet stability when all students are using the computer lab, laptops, and Chromebooks  –  
+
+
+    -- General computer section
+
+    number_of_teachers_that_have_laptops INT, -- How many of your teachers own laptops?
     number_of_full_time_IT_teachers INT, -- Number of full-time IT teachers
     number_of_teachers_that_also_teach_IT INT, -- Number of teachers who also teach IT
-    number_of_teachers_that_have_laptops INT, -- How many of your teachers own laptops?
+
+    -- If they have an IT teacher of either IT type is > 0 then ask the following. If the have an IT teacher then word this question as:  “... IT teacher …” else word it as “... main teacher that teaches IT..”.
     primary_IT_teacher_name VARCHAR(50), -- Name of the main IT teacher
     primary_IT_teacher_phone VARCHAR(50), -- Phone number of the main IT teacher
     primary_IT_teacher_email VARCHAR(50), -- Email of the main IT teacher
-    percentage_of_students_who_have_personal_computers INT, -- % of students who own computers
-    access_to_computers INT, -- % of students with computer access outside school
-    access_to_phones_for_school_work INT, -- % of students using phones for school work
-    comments TEXT,
-    admin_comments TEXT,
+
+    -- For the percentages below make a dropdown to fill in the INT (less than 20%, 20% - 40%, 40% - 60%, 60% - 80%, 80%+)
+
+    percentage_of_students_who_have_personal_computers INT, -- Estimate of the percentage of your students who own computers
+    students_computers_outside_school INT, -- Estimate of the percentage of your  students who have access to computers outside of school
+    students__phones_for_school_work  INT, -- Estimate of the percentage of your students who use phones for their school work
+
+    comments TEXT,  -- Do you have any comments about the above information
+
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (school_id) REFERENCES school(id)
