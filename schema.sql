@@ -72,9 +72,9 @@ Convert MOE xlsx file into LibreCalc ODS file.
 
 -- Drop old and Create the database if it doesn't exist
 
-DROP DATABASE IF EXISTS Belize_Project;
-CREATE DATABASE IF NOT EXISTS Belize_Project;
-USE Belize_Project;
+DROP DATABASE IF EXISTS belize_db;
+CREATE DATABASE IF NOT EXISTS belize_db;
+USE belize_db;
 
 -- School information as proveded by the MOE - Giga connected schools
 
