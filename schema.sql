@@ -267,8 +267,8 @@ CREATE TABLE curriculum (
     data_base BOOLEAN, -- Does your school teach about databases such as MS Access, LibreOffice Base, MySQL?
     slide_show BOOLEAN, -- Does your school teach slide show design such as: PowerPoint, LibreOffice Present, Google Slides?
     google_workspace BOOLEAN, -- Does your school also teach Google Workspace such as Google Docs, Sheets, etc.?
-    software_suite VARCHAR(50), -- Which software suite does your school prefer? (‘Do not know’, ‘Microsoft Office’, ‘LibreOffice’, ‘OpenOffice’, ‘Google WorkSpace’, ‘Both Office and Workspace’)
-    cloud_based_learning_tools BOOLEAN, -- Does your school use other learning websites such as typing, spelling, match, etc.?
+    software_suite VARCHAR(50), -- Which software suite does your school prefer? (‘Do not know’, ‘Microsoft Office’, ‘LibreOffice’, ‘OpenOffice’, ‘Google WorkSpace’, ‘Both Office and Workspace’,'’No preference’)
+    cloud_based_learning_tools BOOLEAN, -- Does your school use other learning websites such as typing, spelling, math, etc.?
     graphics_design BOOLEAN, -- Does your school teach graphics design tools such as Photoshop, Illustrator, Publisher, Canva, PosterMyWall or equivalent?
     graphics_animation BOOLEAN, -- Does your school teach graphics animation such as Blender or equivalent?
     graphics_cad_program BOOLEAN, -- Does your school teach graphics CAD tools such as AutoCad or equivalent?
