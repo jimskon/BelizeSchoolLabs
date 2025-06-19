@@ -367,9 +367,10 @@ CREATE TABLE account_requests (
 
 
 );
+-- Table to store the names of fields that must be answered before a grant can be eligable for review
 
 CREATE TABLE requiredfields (
-    tablename VARCHAR(50) PRIMARY KEY, -- name of the table to check
+    tablename VARCHAR(50) PRIMARY KEY,  -- name of the table to check
     required TEXT NOT NULL              -- comma-separated list of required fields
 );
 
