@@ -2,8 +2,11 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const dashboardRoutes = require('./dashboard/routes'); // adjust path
+const genericTableRouter = require('./utils/genericTableRouter');
 
 require('dotenv').config();
+
 
 const app = express();
 app.use(cors());
@@ -13,7 +16,9 @@ app.use(express.json());
 app.use('/api/school', require('./school/routes'));
 app.use('/api/auth', require('./auth/routes'));
 app.use('/api/request', require('./request/routes'));
-
+app.use('/api/school', dashboardRoutes);
++// Generic table data routes
++app.use('/api', genericTableRouter);
 
 
 // Optional test route

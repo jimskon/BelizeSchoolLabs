@@ -39,8 +39,21 @@ export default function ValidateSchoolPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(schoolData),
     });
+
     const result = await res.json();
+
     if (result.success) {
+      // ✅ Store the school object with the required fields
+      const school = {
+        id: result.school?.id || schoolData.school_id, // ensure ID is present
+        name: result.school?.name || schoolData.name
+      };
+
+      localStorage.setItem('school', JSON.stringify(school));
+
+
+      console.log('Stored school:', school);
+      // ✅ Redirect to main dashboard
       navigate('/main');
     } else {
       alert("Error: " + result.error);

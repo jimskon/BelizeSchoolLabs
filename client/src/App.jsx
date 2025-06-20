@@ -5,6 +5,9 @@ import LoginPage from './pages/LoginPage';
 import RequestAccountPage from './pages/RequestAccountPage';
 import ValidateSchoolPage from './pages/ValidateSchoolPage';
 import BootstrapLayout from './components/BootstrapLayout';
+import HomePage from './pages/HomePage';
+import EditPage from './pages/EditPage';
+
 
 export default function App() {
   return (
@@ -15,6 +18,9 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/request-account" element={<RequestAccountPage />} />
           <Route path="/validate" element={<ValidateSchoolPage />} />
+          <Route path="/main" element={<HomePage />} />
+          <Route path="/:table/edit" element={<EditPage />} />
+
         </Routes>
       </BootstrapLayout>
     </Router>

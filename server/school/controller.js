@@ -1,9 +1,11 @@
 // source/school/controller.js
 const pool = require('../db');
 
+
+
 exports.getMoeSchools = async (req, res) => {
-const [rows] = await pool.query('SELECT name, district FROM moe_school_info ORDER BY name');
-    //console.log("SCHOOLS:",rows);
+  const [rows] = await pool.query('SELECT name, district FROM moe_school_info ORDER BY name');
+  //console.log("SCHOOLS:",rows);
   res.json(rows);
 };
 
@@ -33,8 +35,8 @@ exports.validateAndCreateSchool = async (req, res) => {
     // Step 2: Create school_info
     await conn.query(`
       INSERT INTO school_info (
-        school_id, moe_name, name, code, address, principal,
-        telephone, telephone_alt1, telephone_alt2,
+        school_id, moe_name, name, code, address,
+        contact_person, telephone, telephone_alt1, telephone_alt2,
         moe_email, email, email_alt, website,
         year_opened, longitude, latitude,
         district, locality, type, sector, ownership,
@@ -56,9 +58,9 @@ exports.validateAndCreateSchool = async (req, res) => {
       data.email || '',
       data.email_alt || '',
       data.website || '',
-      data.year_opened || null,
-      data.longitude || null,
-      data.latitude || null,
+      (data.year_opened ? parseInt(data.year_opened, 10) : null),
+      (data.longitude ? parseFloat(data.longitude) : null),
+      (data.latitude ? parseFloat(data.latitude) : null),
       data.district || '',
       data.locality || '',
       data.type || '',
@@ -71,7 +73,7 @@ exports.validateAndCreateSchool = async (req, res) => {
     ]);
 
     await conn.commit();
-    res.json({ success: true });
+    res.json({ success: true, school: { id: schoolId, name: data.name } });
   } catch (err) {
     await conn.rollback();
     console.error('Validation error:', err);
