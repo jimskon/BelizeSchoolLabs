@@ -13,7 +13,7 @@ export default function NavBar() {
     <Navbar bg="primary" variant="dark" expand="lg" className="w-100">
       <Container fluid>
         <Navbar.Brand as={Link} to="/main" className="text-white">
-          Belize School Computer Labs
+          Belize School Computer Management System
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
