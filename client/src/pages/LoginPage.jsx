@@ -1,4 +1,3 @@
-// client/src/pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import SchoolSelector from '../components/SchoolSelector';
@@ -17,10 +16,7 @@ export default function LoginPage() {
     const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: selectedSchool,
-        password
-      })
+      body: JSON.stringify({ name: selectedSchool, password })
     });
 
     const data = await res.json();
@@ -37,32 +33,44 @@ export default function LoginPage() {
 
   return (
     <div className="container mt-5">
-      <h2>School Login</h2>
-      <SchoolSelector
-        selectedSchool={selectedSchool}
-        setSelectedSchool={setSelectedSchool}
-        selectedDistrict={selectedDistrict}
-        setSelectedDistrict={setSelectedDistrict}
-      />
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card shadow-sm">
+            <div className="card-header bg-primary text-white">
+              <h4 className="mb-0 text-center">School Login</h4>
+            </div>
+            <div className="card-body">
+              <SchoolSelector
+                selectedSchool={selectedSchool}
+                setSelectedSchool={setSelectedSchool}
+                selectedDistrict={selectedDistrict}
+                setSelectedDistrict={setSelectedDistrict}
+              />
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Password</label>
-        <input
-          type="password"
-          className="form-control"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              <button className="btn btn-primary w-100" onClick={handleLogin}>
+                Login
+              </button>
+
+              {error && <div className="alert alert-danger mt-3">{error}</div>}
+
+              <p className="mt-4 text-center">
+                Don't have an account?{' '}
+                <Link to="/request-account">Request one here.</Link>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <button className="btn btn-primary" onClick={handleLogin}>Login</button>
-
-      {error && <div className="alert alert-danger mt-3">{error}</div>}
-
-      <p className="mt-4">
-        Don't have an account?{' '}
-        <Link to="/request-account">Request one here.</Link>
-      </p>
     </div>
   );
 }

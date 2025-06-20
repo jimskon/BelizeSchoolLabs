@@ -1,4 +1,3 @@
-// client/src/pages/ValidateSchoolPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -43,17 +42,13 @@ export default function ValidateSchoolPage() {
     const result = await res.json();
 
     if (result.success) {
-      // ✅ Store the school object with the required fields
       const school = {
-        id: result.school?.id || schoolData.school_id, // ensure ID is present
+        id: result.school?.id || schoolData.school_id,
         name: result.school?.name || schoolData.name
       };
 
       localStorage.setItem('school', JSON.stringify(school));
-
-
       console.log('Stored school:', school);
-      // ✅ Redirect to main dashboard
       navigate('/main');
     } else {
       alert("Error: " + result.error);
@@ -76,43 +71,48 @@ export default function ValidateSchoolPage() {
   ];
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">Validate School Information</h2>
-      <div className="row">
-        {textFields.map((key) => (
-          <div className="col-md-6 mb-3" key={key}>
-            <label className="form-label fw-semibold">
-              {key.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())}
-            </label>
-            <input
-              type={key === 'year_opened' ? 'number' : 'text'}
-              className="form-control"
-              value={schoolData[key] || ''}
-              onChange={(e) => handleChange(key, e.target.value)}
-            />
-          </div>
-        ))}
+    <div className="container py-5">
+      <div className="bg-light p-4 rounded shadow-sm">
+        <h2 className="mb-4 text-primary border-bottom pb-2">Validate School Information</h2>
 
-        {selectFields.map(({ key, options }) => (
-          <div className="col-md-6 mb-3" key={key}>
-            <label className="form-label fw-semibold">
-              {key.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())}
-            </label>
-            <select
-              className="form-select"
-              value={schoolData[key] || ''}
-              onChange={(e) => handleChange(key, e.target.value)}
-            >
-              <option value="">-- Select --</option>
-              {options.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
-        ))}
+        <div className="row g-3">
+          {textFields.map((key) => (
+            <div className="col-md-6" key={key}>
+              <label className="form-label fw-semibold">
+                {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              </label>
+              <input
+                type={key === 'year_opened' ? 'number' : 'text'}
+                className="form-control border-secondary"
+                value={schoolData[key] || ''}
+                onChange={(e) => handleChange(key, e.target.value)}
+              />
+            </div>
+          ))}
+
+          {selectFields.map(({ key, options }) => (
+            <div className="col-md-6" key={key}>
+              <label className="form-label fw-semibold">
+                {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              </label>
+              <select
+                className="form-select border-secondary"
+                value={schoolData[key] || ''}
+                onChange={(e) => handleChange(key, e.target.value)}
+              >
+                <option value="">-- Select --</option>
+                {options.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+
+        <div className="d-flex justify-content-end mt-4">
+          <button className="btn btn-primary px-4 py-2" onClick={handleSubmit}>Validate & Save</button>
+        </div>
       </div>
-
-      <button className="btn btn-primary mt-4" onClick={handleSubmit}>Validate & Save</button>
     </div>
   );
 }
