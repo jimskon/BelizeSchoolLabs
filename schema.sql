@@ -60,6 +60,8 @@ Convert MOE xlsx file into LibreCalc ODS file.
         LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-GigaConnected.csv' INTO TABLE moe_giga_connected FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
         LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-CodeOrg.csv' INTO TABLE moe_code_org FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;        
 
+		- - - - - - FOLLOWING IS FOR TEST PURPOSES - - - - - - -
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Testing.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
 
         WARNING! - Check each database table to ensure the data is correct. If a cell in the original spread sheet has a CR in it some rows will be screwed up
 
@@ -255,7 +257,7 @@ CREATE TABLE demographics (
     FOREIGN KEY (school_id) REFERENCES school(id)
 );
 
--- Table of information on school computer curriculum
+-- Currently taught school computer curriculum
 
 CREATE TABLE curriculum (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -288,21 +290,58 @@ CREATE TABLE curriculum (
     FOREIGN KEY (school_id) REFERENCES school(id)
 );
 
--- Table to store lab configuration information
+-- Future computer room (if a new lab was donated)
+
+-- "If your school was granted enough computers for your first or additional computer lab, what would you teach there?"
+
+CREATE TABLE future_curriculum (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    school_id INT,	
+	keyboarding BOOLEAN,-- Would your school teach general keyboarding?
+	computer_literacy BOOLEAN,-- Would your school  teach computer literacy?
+	word BOOLEAN, -- Would your school teach word processing, such as Microsoft Word, LibreOffice/OpenOffice Write, or Google Docs?
+	spread_sheet BOOLEAN, -- Would your school teach spreadsheets such as Excel, LibreOffice Calc, or Google Sheets?
+	data_base BOOLEAN, -- Would your school teach about databases such as MS Access, LibreOffice Base, MySQL?
+	slide_show BOOLEAN, -- Would your school teach slide show design, such as: PowerPoint, LibreOffice Present, Google Slides?
+	google_workspace BOOLEAN, -- Would your school also teach Google Workspace, such as Google Docs, Sheets, etc.?
+	software_suite VARCHAR(50),  -- Which software suite would your school prefer?  (‘Do not know’,’Microsoft Office’, ‘LibreOffice’, ‘OpenOffice’, ‘Google WorkSpace’,’Both Office and Workspace’, ’No preference’),
+	cloud_based_learning_tools BOOLEAN, -- Would your school use other learning websites such as typing, spelling, math, etc.?
+	graphics_design BOOLEAN,  -- Would your school teach graphics design tools such as Photoshop, Illustrator, Publisher, Canva, PosterMyWall, or equivalent?
+	graphics_animation BOOLEAN, -- Would your school teach graphics animation such as Blender, SketchUP, or equivalent?
+	graphics_cad_program BOOLEAN, -- Would your school teach graphics CAD tools such as AutoCad or equivalent?
+	robotics BOOLEAN, -- Would your school teach robotics?
+	code_dot_org BOOLEAN, -- Would your school use code.org
+	khan_accadamy BOOLEAN, -- Would your school use Khan Academy or similar online learning platforms?
+	edpm BOOLEAN, -- Would your school use EDPM?
+	other_online_local_education_tools VARCHAR(50), -- What other Website tools would your school use or teach?
+	formal_curriculum VARCHAR(50), -- What formal computer-related curriculum would your school use, if any? 
+	local_curriculum VARCHAR(50),  -- What locally generated computer-related curriculum would your school use  -- (Made by a local -- -- teacher’, ‘Made by our management’, ‘From an online book’, ‘We do not have a locally generated curriculum’,’Our teachers create their own’,’other)
+	rachel_server BOOLEAN, -- Would your school participate in the Rachel server project?
+	other VARCHAR(250), -- What other computer-related teaching tools would your school  use that were not mentioned above?
+    comments TEXT,
+    admin_comments TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (school_id) REFERENCES school(id)
+);
+
+-- Current computer lab configuration table
+
+	--  NOTE: THE FOLLOWING QUESTIONS ONLY ASKED IF THEY HAVE A COMPUTER ROOM; demographics.number_of_computer_labs > 0
 
 CREATE TABLE computerRoom (
     id INT PRIMARY KEY AUTO_INCREMENT,
     school_id INT,
-
-        --  NOTE: THE FOLLOWING QUESTIONS ONLY ASKED IF THEY HAVE A COMPUTER ROOM; demographics.number_of_computer_labs > 0
 
     wired_for_lab BOOLEAN, -- Has your computer room been wired expressly for a computer lab?
     electrical BOOLEAN, -- Does your computer room have a dedicated electrical service panel in the computer room?
     electrical_ground BOOLEAN, -- Is there a quality ground wire connected to a ground rod?
     electrical_outlets INT, -- How many electrical outlets are in the computer room?
     air_condition INT, -- How many working air conditioners does your computer lab have?
-    num_of_doors INT, -- How many doors does the computer room have?
-    num_of_doors_secure INT, -- How many doors with burglar bars does the computer room have?
+-- delete: num_of_doors INT, -- How many doors does the computer room have?
+-- delete: num_of_doors_secure INT, -- How many doors with burglar bars does the computer room have?
+-- add following: 
+	doors_secure BOOLEAN, --  Do all the doors in your computer room have burglar bars?
     partition_security BOOLEAN, -- Are all 4 walls in your computer room concrete including the partition to the next room?
     ceiling_secure BOOLEAN, -- Is your computer lab ceiling constructed of concrete or steel with no open spaces and secured from a thief climbing over the partitioned wall?
     windows_secure BOOLEAN, -- Are all the windows removed and blocked, or have strong burglar bars installed?
@@ -316,10 +355,7 @@ CREATE TABLE computerRoom (
     FOREIGN KEY (school_id) REFERENCES school(id)
 );
 
--- Table to store available and requested resources
-
-
--- Table to store available and requested resources
+-- Table to store available resources
 
 CREATE TABLE resources (
     id INT PRIMARY KEY AUTO_INCREMENT,
