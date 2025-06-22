@@ -91,7 +91,8 @@ CREATE TABLE moe_giga_connected (
     telephone_alt1 VARCHAR(20), -- School's contact person's phone number
     email_alt1 VARCHAR(50), -- School's email address
     email_alt2 VARCHAR(50), -- School's email address
-    admin_comments TEXT,
+
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -107,7 +108,8 @@ CREATE TABLE moe_code_org (
     telephone VARCHAR(20), -- School's contact person's phone number
     telephone_alt1 VARCHAR(20), -- Alternative school phone number
     telephone_alt2 VARCHAR(20), -- Alternative school phone number
-    admin_comments TEXT,    
+
+    admin_comments TEXT, -- (Only seen by the administrator)    
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -136,7 +138,8 @@ CREATE TABLE moe_school_info (
     sector ENUM ('Government', 'Government Aided', 'Private','Specially Assisted'),
     school_Administrator_1 VARCHAR(50),
     school_Administrator_2 VARCHAR(50),
-    admin_comments TEXT,
+	
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -149,8 +152,9 @@ CREATE TABLE school (
     code VARCHAR(10), -- MOE's code for this school
     password VARCHAR(255), -- Generated password sent to MOE email
     answered_filled_out BOOLEAN,  -- Yes, Have you filled out all the answers; or No, I did not know all the answers I will have someone else help me
-    comments TEXT,
-    admin_comments TEXT,
+	
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -185,9 +189,11 @@ CREATE TABLE school_info (
     sector ENUM ('Government', 'Government Aided', 'Private','Specially Assisted'),
     school_administrator_1 VARCHAR(50), -- Administrator 1 name
     School_administrator_2 VARCHAR(50), -- Administrator 2 name
-    comments TEXT,
-    admin_comments TEXT,
-    verified_at DATETIME,
+	
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
+    verified_at DATETIME, -- Timestamp when the contact person / principal stated that this data was verified
+
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (school_id) REFERENCES school(id)
@@ -231,7 +237,6 @@ CREATE TABLE demographics (
     connection_method VARCHAR(50), -- Internet connection method (‘Fiber’, ‘Cable’, ‘Wireless ISP’, ‘Hot Spot’, ‘Other’),
     internet_stability ENUM ('Very stable', 'Mostly OK','Comes in and out','Unstable'), -- Describe the Internet stability when all students are using the computer lab, laptops, and Chromebooks  –  
 
-
     -- General computer section
 
     number_of_teachers_that_have_laptops INT, -- How many of your teachers own laptops?
@@ -250,7 +255,6 @@ CREATE TABLE demographics (
     students__phones_for_school_work  INT, -- Estimate of the percentage of your students who use phones for their school work
 
     comments TEXT,  -- Do you have any comments about the above information
-
     admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -283,8 +287,9 @@ CREATE TABLE curriculum (
     local_curriculum VARCHAR(50), -- What locally generated computer related curriculum does your school use?
     rachel_server BOOLEAN, -- Does your school participate in the Rachel server project?
     other VARCHAR(250), -- What other computer related teaching tools do you use that were not mentioned above?
-    comments TEXT,
-    admin_comments TEXT,
+	
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (school_id) REFERENCES school(id)
@@ -295,8 +300,9 @@ CREATE TABLE curriculum (
 -- "If your school was granted enough computers for your first or additional computer lab, what would you teach there?"
 
 CREATE TABLE future_curriculum (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    school_id INT,	
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	school_id INT,	
+	
 	keyboarding BOOLEAN,-- Would your school teach general keyboarding?
 	computer_literacy BOOLEAN,-- Would your school  teach computer literacy?
 	word BOOLEAN, -- Would your school teach word processing, such as Microsoft Word, LibreOffice/OpenOffice Write, or Google Docs?
@@ -315,15 +321,17 @@ CREATE TABLE future_curriculum (
 	edpm BOOLEAN, -- Would your school use EDPM?
 	other_online_local_education_tools VARCHAR(50), -- What other Website tools would your school use or teach?
 	formal_curriculum VARCHAR(50), -- What formal computer-related curriculum would your school use, if any? 
-	local_curriculum VARCHAR(50),  -- What locally generated computer-related curriculum would your school use  -- (Made by a local -- -- teacher’, ‘Made by our management’, ‘From an online book’, ‘We do not have a locally generated curriculum’,’Our teachers create their own’,’other)
+	local_curriculum VARCHAR(50),  -- What locally generated computer-related curriculum would your school use  -- ('Made by a local teacher’, ‘Made by our management’, ‘From an online book’, ‘We do not have a locally generated curriculum’,’Our teachers create their own’,’other)
 	rachel_server BOOLEAN, -- Would your school participate in the Rachel server project?
 	other VARCHAR(250), -- What other computer-related teaching tools would your school  use that were not mentioned above?
-    comments TEXT,
-    admin_comments TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (school_id) REFERENCES school(id)
+	
+	comments TEXT,  -- Do you have any comments about the above information
+	admin_comments TEXT, -- (Only seen by the administrator)
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (school_id) REFERENCES school(id)
 );
+
 
 -- Current computer lab configuration table
 
@@ -338,6 +346,7 @@ CREATE TABLE computerRoom (
     electrical_ground BOOLEAN, -- Is there a quality ground wire connected to a ground rod?
     electrical_outlets INT, -- How many electrical outlets are in the computer room?
     air_condition INT, -- How many working air conditioners does your computer lab have?
+	
 -- delete: num_of_doors INT, -- How many doors does the computer room have?
 -- delete: num_of_doors_secure INT, -- How many doors with burglar bars does the computer room have?
 -- add following: 
@@ -348,11 +357,44 @@ CREATE TABLE computerRoom (
     lighting BOOLEAN, -- Is the lighting in your computer room sufficient (even when all windows are blocked)?
     location BOOLEAN, -- Is your computer room located at the end of your building (i.e. with 3 outside walls)?
     location_floor BOOLEAN, -- Is your computer room located on the first floor?
-    comments TEXT,
-    admin_comments TEXT,
+
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (school_id) REFERENCES school(id)
+);
+
+	-- Future Computer Room Questions
+
+ 	-- Ask these questions if they need to create a new computer room
+/*
+	A proper computer lab requires good quality lighting, wiring, plugs, ground wire, grounding rod and quality service panel. 
+	It also requires working A/C units, security on doors, windows, walls and ceiling. The following questions are designed to
+	assess the appropriateness of your future computer lab. There may be some funding to help in upgrading your room.
+*/
+
+    CREATE TABLE future_computerRoom (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	school_id INT,
+	number_seats INT, -- How many student computer stations can your future computer room accommodate?
+	wired_for_lab BOOLEAN, -- Is your future computer room wired for a computer lab with an Ethernet switch? 
+	electrical BOOLEAN, -- Does your future computer room have a dedicated electrical service panel or one close by?
+	electrical_ground  BOOLEAN, -- Is there a quality ground wire in your service panel connected to a ground rod?
+	electrical_outlets  INT, -- How many electrical outlets are in the computer room?
+	air_condition  INT, -- How many working air conditioners does your computer lab have?
+	doors_secure BOOLEAN,  -- Do all the doors in your future computer room have burglar bars?
+	partition_security BOOLEAN, -- Are all 4 walls in your future computer room concrete, including the partition to the next room?
+	ceiling_secure BOOLEAN, -- Is your future  computer lab ceiling constructed of concrete or steel with no open spaces and secured from a thief climbing over the partitioned wall?
+	windows_secure BOOLEAN, -- Are all the windows removed and blocked, or have strong burglar bars installed?
+	lighting BOOLEAN, -- Is the lighting in your future computer room sufficient (even when all windows are blocked)?
+	location BOOLEAN, -- Is your future computer room located at the end of your building (i.e. with 3 outside walls)?
+	location_floor BOOLEAN, -- Is your future computer room located on the first floor?
+	comments TEXT,  -- Do you have any comments about the above information
+	admin_comments TEXT, -- (Only seen by the administrator)
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (school_id) REFERENCES school(id)
 );
 
 -- Table to store available resources
@@ -392,8 +434,8 @@ CREATE TABLE resources (
     old_computers_work VARCHAR(50), -- What do you plan to do with your old computers and tablets that still work?
     old_computers_broken VARCHAR(50), -- What do you plan to do with your broken computers and tablets?
 
-    comments TEXT,
-    admin_comments TEXT,
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (school_id) REFERENCES school(id)
@@ -408,8 +450,9 @@ CREATE TABLE pictures (
     file_url VARCHAR(50),
     file_type VARCHAR(50),
     approved_for_adver BOOLEAN, -- Set by the administrator
-    comments TEXT,
-    admin_comments TEXT,
+
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -423,8 +466,9 @@ CREATE TABLE school_grant_status (
     number_of_computers INT,
     type_of_computers VARCHAR(50),
     number_of_ethernet_switches INT,
-    comments TEXT,
-    admin_comments TEXT,
+
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (school_id) REFERENCES school(id)
@@ -448,15 +492,14 @@ CREATE TABLE account_requests (
   requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   reviewed_at DATETIME NULL
 
-
 );
+
 -- Table to store the names of fields that must be answered before a grant can be eligable for review
 
 CREATE TABLE requiredfields (
     tablename VARCHAR(50) PRIMARY KEY,  -- name of the table to check
     required TEXT NOT NULL              -- comma-separated list of required fields
 );
-
 
 /*
 -- Table to store information about the MOE district manager
@@ -470,8 +513,9 @@ CREATE TABLE district (
     website VARCHAR(100),
     facebook VARCHAR(100),
     password VARCHAR(50),  -- password need to add/edit this information. 'name' is the username
-    comments TEXT,
-    admin_comments TEXT,
+
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -487,12 +531,12 @@ CREATE TABLE management (
     website VARCHAR(100),
     facebook VARCHAR(100),
     password VARCHAR(50),  -- password need to add/edit this information. 'name' is the username
-    comments TEXT,
-    admin_comments TEXT,
+
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 
 -- Table to store staff details (teachers, managers, district representative)
 
@@ -508,8 +552,9 @@ CREATE TABLE school_staff (
     role VARCHAR(50),
     experience TEXT,
     resume_file_path VARCHAR(255),
-    comments TEXT,
-    admin_comments TEXT,
+
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     approved_for_advertising BOOLEAN,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -529,8 +574,9 @@ CREATE TABLE school_staff_laptop (
     eligible_for_renewal DATE,
     serial_number VARCHAR(50),
     quality VARCHAR(10), -- such as "good", "fair", "poor", "broken"
-    comments TEXT,
-    admin_comments TEXT,
+
+    comments TEXT,  -- Do you have any comments about the above information
+    admin_comments TEXT, -- (Only seen by the administrator)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (school_staff_id) REFERENCES school_staff(id),
