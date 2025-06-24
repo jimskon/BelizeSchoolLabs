@@ -22,6 +22,9 @@ exports.login = async (req, res) => {
       return res.json({ success: false, error: 'Invalid credentials' });
     }
 
+    const needsPasswordReset = !!schoolRow.is_temp_password;
+
+
     // Compare input password with hashed password
     const passwordMatches = await bcrypt.compare(password, schoolRow.password);
 
@@ -41,12 +44,16 @@ exports.login = async (req, res) => {
     );
 
     const needsValidation = infoRows.length === 0;
-
     res.json({
       success: true,
-      name: schoolRow.name,  
-      needsValidation
+      name: schoolRow.name,
+      schoolId: schoolRow.id,  // ← Added this line
+      needsValidation,
+      //needsPasswordReset
     });
+
+
+    console.log('Login successful');
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ success: false, error: 'Server error' });
@@ -204,5 +211,28 @@ exports.approveRequest = async (req, res) => {
     res.status(500).json({ success: false, error: 'Approval failed' });
   }
 };
+
+exports.resetPassword = async (req, res) => {
+  const { school_id, newPassword } = req.body;
+
+  if (!school_id || !newPassword) {
+    return res.status(400).json({ success: false, error: 'Missing school ID or password.' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(newPassword, 10); // secure hash
+
+    await db.query(
+      'UPDATE school SET password = ?, is_temp_password = FALSE WHERE id = ?',
+      [hashedPassword, school_id]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Password reset error:', err);
+    res.status(500).json({ success: false, error: 'Server error during password reset.' });
+  }
+};
+
 
 

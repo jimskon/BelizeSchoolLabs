@@ -15,10 +15,15 @@ export default function ValidateSchoolPage() {
         const res = await fetch(`${API_BASE_URL}/api/school/validate-needed?name=${encodeURIComponent(schoolName)}`);
         const data = await res.json();
         if (res.ok) {
-          setSchoolData(data);
+          const fullData = {
+            ...data,
+            school_id: data.school_id || data.id // fallback if available
+          };
+          setSchoolData(fullData);
         } else {
           alert('Error loading school data: ' + data.error);
         }
+
       } catch (err) {
         console.error("Error fetching school data:", err);
         alert("Failed to load school data.");
