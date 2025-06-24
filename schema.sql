@@ -57,8 +57,8 @@ Convert MOE xlsx file into LibreCalc ODS file.
 
         Load the additional MOE spreadsheet info Giga Connected Schools and Code Dot Org schools
 
-        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-GigaConnected.csv' INTO TABLE moe_giga_connected FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-CodeOrg.csv' INTO TABLE moe_code_org FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;        
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-CodeDotOrg.csv' INTO TABLE moe_code_org FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+        LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-GigaFromMOE.csv' INTO TABLE moe_giga_connected FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;    
 
 		- - - - - - FOLLOWING IS FOR TEST PURPOSES - - - - - - -
         LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Testing.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
@@ -484,10 +484,10 @@ CREATE TABLE account_requests (
   contact_name VARCHAR(100),
   contact_email VARCHAR(255),
   contact_phone VARCHAR(50),
-
+/* -- Not needed for this menu
   school_phone VARCHAR(50),
   school_email VARCHAR(255),
-
+*/
   status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
   requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   reviewed_at DATETIME NULL
