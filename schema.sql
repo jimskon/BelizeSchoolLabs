@@ -505,14 +505,13 @@ CREATE TABLE form_fields (
   id INT AUTO_INCREMENT PRIMARY KEY,
   table_name VARCHAR(50),
   field_name VARCHAR(50),
-  prompt VARCHAR(100),
+  prompt VARCHAR(255),
   type VARCHAR(50), -- 'text', 'email', 'phone', 'dropdown', 'num(min-max)', etc.
   valuelist TEXT, -- Comma-separated options for dropdowns
   field_width INT, -- Width in Bootstrap columns or percent
-  required BOOLEAN,
-  visible BOOLEAN
+  required TINYINT(1),
+  visible TINYINT(1)
 );
-
 
 /*
 -- Table to store information about the MOE district manager
