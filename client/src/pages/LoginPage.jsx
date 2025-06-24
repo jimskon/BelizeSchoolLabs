@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  /*const handleLogin = async () => {
     setError('');
     const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
@@ -20,9 +20,38 @@ export default function LoginPage() {
     });
 
     const data = await res.json();
+
     if (res.ok && data.success) {
+      const school = { name: selectedSchool }; // Save session data
+      localStorage.setItem('school', JSON.stringify(school));
+
       if (data.needsValidation) {
         navigate(`/validate?name=${encodeURIComponent(data.name)}`);
+      } else if (data.needsPasswordReset) {
+        navigate('/reset-password'); // ✅ Redirect here for temp password reset
+      } else {
+        navigate('/main');
+      }
+    } else {
+      setError(data.error || 'Login failed. Please check your credentials.');
+    }
+  };*/
+
+  const handleLogin = async () => {
+    setError('');
+    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: selectedSchool, password })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      const schoolSession = { id: data.schoolId, name: data.name };
+      localStorage.setItem('school', JSON.stringify(schoolSession));
+      if (data.needsValidation) {
+        navigate(`/validate?name=${encodeURIComponent(data.name)}`);
+      } else if (data.needsPasswordReset) {
+        navigate('/reset-password');
       } else {
         navigate('/main');
       }
@@ -30,6 +59,8 @@ export default function LoginPage() {
       setError(data.error || 'Login failed. Please check your credentials.');
     }
   };
+
+
 
   return (
     <div className="container mt-5">

@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const dashboardRoutes = require('./dashboard/routes'); // adjust path
 const genericTableRouter = require('./utils/genericTableRouter');
+const formConfigRouter = require('./utils/formConfigRouter');
 
 require('dotenv').config();
 
@@ -17,8 +18,10 @@ app.use('/api/school', require('./school/routes'));
 app.use('/api/auth', require('./auth/routes'));
 app.use('/api/request', require('./request/routes'));
 app.use('/api/school', dashboardRoutes);
-+// Generic table data routes
-+app.use('/api', genericTableRouter);
+// Serve form-config API before generic table routes to avoid conflicts
+app.use('/api/form-config', require('./utils/formConfigRouter'));
+app.use('/api', genericTableRouter); // Generic table data routes
+
 
 
 // Optional test route

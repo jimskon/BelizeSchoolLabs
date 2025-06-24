@@ -78,8 +78,10 @@ export default function HomePage() {
                   <h5 className="card-title text-capitalize">{table.replace(/_/g, ' ')}</h5>
                   <p className="card-text mb-2">
                     <span className={`badge me-2 ${
-                      status === 'Complete' ? 'bg-success' :
-                      status === 'In Progress' ? 'bg-warning text-dark' :
+                      status === 'Input complete' ? 'bg-success' :
+                      status === 'Required fields complete' ? 'bg-warning text-dark' :
+                      status === 'In progress' ? 'bg-info text-dark' :
+                      status === 'Not started' ? 'bg-secondary' :
                       'bg-secondary'
                     }`}>{status}</span>
                     <small className="text-muted">

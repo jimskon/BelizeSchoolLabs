@@ -20,6 +20,18 @@ router.use('/:table', (req, res, next) => {
   next();
 });
 
+// GET ALL: list all records for table
+router.get('/:table/list', async (req, res) => {
+  const { table } = req.params;
+  try {
+    const [rows] = await db.query('SELECT * FROM ??', [table]);
+    res.json(rows);
+  } catch (err) {
+    console.error(`Error listing data for table ${table}:`, err);
+    res.status(500).json({ error: 'Failed to list data' });
+  }
+});
+
 // GET: fetch or build empty record
 router.get('/:table', async (req, res) => {
   const { table } = req.params;
@@ -64,6 +76,13 @@ router.get('/:table', async (req, res) => {
 router.post('/:table', async (req, res) => {
   const { table } = req.params;
   const data = req.body;
+
+  // Normalize boolean and numeric string values
+  Object.keys(data).forEach(key => {
+    if (data[key] === 'Yes') data[key] = 1;
+    else if (data[key] === 'No') data[key] = 0;
+    else if (typeof data[key] === 'string' && /^[0-9]+$/.test(data[key])) data[key] = Number(data[key]);
+  });
   const schoolId = data.school_id;
   if (!schoolId || isNaN(Number(schoolId))) {
     return res.status(400).json({ success: false, error: 'Invalid or missing school_id' });
