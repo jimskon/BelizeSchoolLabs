@@ -6,15 +6,28 @@ export default function GenericForm({ tableName, initialData = {}, onSubmit, onC
     const [config, setConfig] = useState([]);
     const [formData, setFormData] = useState(initialData);
     const [errors, setErrors] = useState([]);
+    const [title, setTitle] = useState('');
+    const [subtitle, setSubtitle] = useState('');
+    const [instructions, setInstructions] = useState('');
+    const [footer, setFooter] = useState('');
 
     // Sync formData when initialData changes
     useEffect(() => setFormData(initialData), [initialData]);
 
-    // Load form configuration
+    // Load form configuration and page metadata
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/form-config/${tableName}`)
             .then(res => res.json())
-            .then(data => data.success && setConfig(data.fields));
+            .then(data => {
+                if (data.success) {
+                    setConfig(data.fields);
+                    setTitle(data.title || '');
+                    setSubtitle(data.subtitle || '');
+                    setInstructions(data.instructions || '');
+                    setFooter(data.footer || '');
+                }
+            })
+            .catch(err => console.error('Failed to load form config', err));
     }, [tableName]);
 
     const handleChange = (key, value) => {
@@ -58,7 +71,6 @@ export default function GenericForm({ tableName, initialData = {}, onSubmit, onC
         }
 
         if (type === 'dropdown') {
-            // Map boolean/integer values to dropdown labels
             let currentValue = rawValue;
             if (options.includes('Yes') && options.includes('No') && (rawValue === 1 || rawValue === 0 || rawValue === true || rawValue === false)) {
                 currentValue = rawValue ? 'Yes' : 'No';
@@ -107,13 +119,20 @@ export default function GenericForm({ tableName, initialData = {}, onSubmit, onC
 
     return (
         <div className="container my-4">
-            <h4 className="mb-3 text-primary">Edit {tableName.replace(/_/g, ' ')}</h4>
+            {title && <h1 className="text-center display-4 mb-2">{title}</h1>}
+            {subtitle && <h3 className="text-center text-secondary mb-3">{subtitle}</h3>}
+            {instructions && <p className="text-center mb-4">{instructions}</p>}
+
             {errors.length > 0 && (
                 <div className="alert alert-danger">Please fill out: {errors.join(', ')}</div>
             )}
+
             <div className="row g-3">
                 {config.filter(f => f.visible).map(renderField)}
             </div>
+
+            {footer && <p className="text-center mt-4">{footer}</p>}
+
             <div className="mt-4 text-end">
                 <button className="btn btn-secondary me-2" onClick={() => onCancel(formData)}>Cancel</button>
                 <button className="btn btn-success" onClick={handleSubmit}>Save</button>

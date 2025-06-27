@@ -13,7 +13,12 @@ router.get('/:tableName', async (req, res) => {
       [tableName]
     );
 
-    res.json({ success: true, fields });
+    const [metaRows] = await db.query(
+      'SELECT title, subtitle, instructions, footer FROM titles WHERE table_name = ?',
+      [tableName]
+    );
+    const meta = metaRows[0] || { title: '', subtitle: '', instructions: '', footer: '' };
+    res.json({ success: true, fields, title: meta.title, subtitle: meta.subtitle, instructions: meta.instructions, footer: meta.footer });
   } catch (err) {
     console.error('Error fetching form config:', err);
     res.status(500).json({ success: false, error: 'Failed to load form config' });

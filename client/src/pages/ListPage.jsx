@@ -8,6 +8,10 @@ export default function ListPage() {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [fields, setFields] = useState([]);
+  const [title, setTitle] = useState('');
+  const [subtitle, setSubtitle] = useState('');
+  const [instructions, setInstructions] = useState('');
+  const [footer, setFooter] = useState('');
 
   // Determine which columns to display: for demographics show all except metadata
   const displayFields = useMemo(() => {
@@ -19,13 +23,20 @@ export default function ListPage() {
     return fields.map(f => f.field_name);
   }, [table, rows, fields]);
 
-  // Load form field metadata
+  // Load form field metadata and page metadata
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/form-config/${table}`)
       .then(res => res.json())
       .then(data => {
-        if (data.success) setFields(data.fields);
-      });
+        if (data.success) {
+          setFields(data.fields);
+          setTitle(data.title || '');
+          setSubtitle(data.subtitle || '');
+          setInstructions(data.instructions || '');
+          setFooter(data.footer || '');
+        }
+      })
+      .catch(err => console.error('Failed to load form config', err));
   }, [table]);
 
   // Load table data (filtered by school_id if available)
@@ -39,7 +50,8 @@ export default function ListPage() {
       .then(res => res.json())
       .then(data => {
         setRows(data);
-      });
+      })
+      .catch(err => console.error('Failed to load table data', err));
   }, [table]);
 
   const handleEdit = (id) => {
@@ -57,9 +69,16 @@ export default function ListPage() {
     }
   };
 
+  const handleSave = () => {
+    navigate(`/${table}/new`);
+  };
+
   return (
     <div className="container my-4">
-      <h4 className="mb-3 text-primary">List {table.replace(/([A-Z])/g, ' $1')}</h4>
+      {title && <h1 className="text-center display-4 mb-2">{title}</h1>}
+      {subtitle && <h3 className="text-center text-secondary mb-3">{subtitle}</h3>}
+      {instructions && <p className="text-center mb-4">{instructions}</p>}
+
       <table className="table table-striped">
         <thead>
           <tr>
@@ -93,6 +112,11 @@ export default function ListPage() {
           ))}
         </tbody>
       </table>
+
+      <div className="text-center mt-4">
+        {footer && <p className="mb-3">{footer}</p>}
+        <button className="btn btn-primary" onClick={handleSave}>Save</button>
+      </div>
     </div>
   );
 }
