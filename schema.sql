@@ -502,16 +502,18 @@ CREATE TABLE requiredfields (
 );
 
 CREATE TABLE form_fields (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  table_name VARCHAR(50),
-  field_name VARCHAR(50),
-  prompt VARCHAR(255),
-  type VARCHAR(50), -- 'text', 'email', 'phone', 'dropdown', 'num(min-max)', etc.
-  valuelist TEXT, -- Comma-separated options for dropdowns
-  field_width INT, -- Width in Bootstrap columns or percent
-  required TINYINT(1),
-  visible TINYINT(1)
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    table_name VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    field_name VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    prompt VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    type VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    valuelist TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    field_width INT(11) DEFAULT NULL,
+    required TINYINT(1) DEFAULT NULL,
+    visible TINYINT(1) DEFAULT NULL,
+    PRIMARY KEY (id)
 );
+
 
 /*
 -- Table to store information about the MOE district manager
