@@ -514,6 +514,17 @@ CREATE TABLE form_fields (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE contact_corrections (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    school_name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+    contact_email VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+    contact_name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    contact_phone VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    status ENUM('pending', 'approved', 'rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
 
 /*
 -- Table to store information about the MOE district manager
