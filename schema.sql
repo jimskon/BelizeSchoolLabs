@@ -526,6 +526,16 @@ CREATE TABLE contact_corrections (
 );
 
 
+CREATE TABLE titles (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    table_name VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    title TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    subtitle TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    instructions TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    footer TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+
 /*
 -- Table to store information about the MOE district manager
 
