@@ -144,8 +144,8 @@ CREATE TABLE moe_school_info (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-
 -- Table to store individual school
+
 CREATE TABLE school (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(80), -- Name for this school
@@ -158,7 +158,6 @@ CREATE TABLE school (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 
 -- School information as originally proveded by the MOE and potentially updated by the principal etc.
 
@@ -474,32 +473,14 @@ CREATE TABLE school_grant_status (
     FOREIGN KEY (school_id) REFERENCES school(id)
 );
 
-CREATE TABLE account_requests (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  school_name VARCHAR(255) NOT NULL,
-  code VARCHAR(10),
-  school_address VARCHAR(255),
-  district VARCHAR(100),
-
-  contact_name VARCHAR(100),
-  contact_email VARCHAR(255),
-  contact_phone VARCHAR(50),
-/* -- Not needed for this menu
-  school_phone VARCHAR(50),
-  school_email VARCHAR(255),
-*/
-  status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-  requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  reviewed_at DATETIME NULL
-
-);
-
 -- Table to store the names of fields that must be answered before a grant can be eligable for review
 
 CREATE TABLE requiredfields (
     tablename VARCHAR(50) PRIMARY KEY,  -- name of the table to check
     required TEXT NOT NULL              -- comma-separated list of required fields
 );
+
+-- Table to specify the edit fields for a given table name.
 
 CREATE TABLE form_fields (
     id INT(11) NOT NULL AUTO_INCREMENT,
@@ -514,6 +495,8 @@ CREATE TABLE form_fields (
     PRIMARY KEY (id)
 );
 
+-- Table to hold the correction requests -- Admin can go in and then correct
+
 CREATE TABLE contact_corrections (
     id INT(11) NOT NULL AUTO_INCREMENT,
     school_name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -525,6 +508,7 @@ CREATE TABLE contact_corrections (
     PRIMARY KEY (id)
 );
 
+-- Table to hold title, subtitle, etc. for a edit information on question pages
 
 CREATE TABLE titles (
     id INT(11) NOT NULL AUTO_INCREMENT,
