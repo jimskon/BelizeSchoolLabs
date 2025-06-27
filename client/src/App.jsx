@@ -8,7 +8,8 @@ import BootstrapLayout from './components/BootstrapLayout';
 import HomePage from './pages/HomePage';
 import ListPage from './pages/ListPage'; // Generic list view
 import EditPage from './pages/EditPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
+//import ResetPasswordPage from './pages/ResetPasswordPage';
+import AdminLoginPage from './pages/AdminLoginPage';
 
 
 
@@ -24,7 +25,7 @@ export default function App() {
           <Route path="/main" element={<HomePage />} />
           <Route path="/:table/list" element={<ListPage />} />
           <Route path="/:table/edit" element={<EditPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
         </Routes>
       </BootstrapLayout>
     </Router>

@@ -46,6 +46,11 @@ async function getTableStatus(table, schoolId) {
   });
 
   // Determine status
+  // If no required fields filled but some visible fields filled, mark in progress
+  if (filledRequired.length === 0 && filledVisible.length > 0) {
+    return 'In progress';
+  }
+  // If no required fields and no visible fields filled, not started
   if (filledRequired.length === 0) {
     return 'Not started';
   }

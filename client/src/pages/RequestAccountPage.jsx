@@ -45,7 +45,7 @@ export default function RequestAccountPage() {
     setError('');
     setSuccessMessage('');
     try {
-      const res = await fetch('/api/auth/send-password-email', {
+      const res = await fetch('/api/auth/send-login-pin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ school_name: selectedSchool })

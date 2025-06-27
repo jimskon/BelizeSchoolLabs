@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SchoolSelector from '../components/SchoolSelector';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
@@ -9,47 +9,54 @@ export default function LoginPage() {
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showCorrectionForm, setShowCorrectionForm] = useState(false);
+  const [correctedEmail, setCorrectedEmail] = useState('');
+  const [correctedName, setCorrectedName] = useState('');
+  const [correctedPhone, setCorrectedPhone] = useState('');
+  const [moeEmail, setMoeEmail] = useState('');
   const navigate = useNavigate();
 
-  /*const handleLogin = async () => {
-    setError('');
-    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: selectedSchool, password })
-    });
+  // Mask email for display: show partial local part and full domain
+  const maskEmail = (email) => {
+    const [local, domain] = email.split('@');
+    if (!domain) return email;
+    if (local.length <= 2) return '*@' + domain;
+    const start = local[0];
+    const end = local[local.length - 1];
+    return `${start}***${end}@${domain}`;
+  };
 
-    const data = await res.json();
-
-    if (res.ok && data.success) {
-      const school = { name: selectedSchool }; // Save session data
-      localStorage.setItem('school', JSON.stringify(school));
-
-      if (data.needsValidation) {
-        navigate(`/validate?name=${encodeURIComponent(data.name)}`);
-      } else if (data.needsPasswordReset) {
-        navigate('/reset-password'); // ✅ Redirect here for temp password reset
-      } else {
-        navigate('/main');
+  useEffect(() => {
+    async function fetchMoeEmail() {
+      setMoeEmail('');
+      if (!selectedSchool) return;
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/api/school/moe-school?name=${encodeURIComponent(selectedSchool)}`
+        );
+        const data = await res.json();
+        setMoeEmail(data.email || '');
+      } catch (err) {
+        console.error('Error fetching MOE email:', err);
       }
-    } else {
-      setError(data.error || 'Login failed. Please check your credentials.');
     }
-  };*/
+    fetchMoeEmail();
+  }, [selectedSchool]);
 
   const handleLogin = async () => {
     setError('');
     const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: selectedSchool, password })
+      body: JSON.stringify({ name: selectedSchool, pin: password })
     });
     const data = await res.json();
     if (res.ok && data.success) {
-      const schoolSession = { id: data.schoolId, name: data.name };
+      const schoolSession = { id: data.schoolId, name: selectedSchool };
+
       localStorage.setItem('school', JSON.stringify(schoolSession));
       if (data.needsValidation) {
-        navigate(`/validate?name=${encodeURIComponent(data.name)}`);
+        navigate(`/validate?name=${encodeURIComponent(selectedSchool)}`)
       } else if (data.needsPasswordReset) {
         navigate('/reset-password');
       } else {
@@ -60,7 +67,49 @@ export default function LoginPage() {
     }
   };
 
+  const handleSendPasswordEmail = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/send-login-pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ school_name: selectedSchool })
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('PIN has been sent to ' + moeEmail);
+      } else {
+        alert(result.error || 'Failed to send PIN');
+      }
+    } catch (err) {
+      console.error('Error sending PIN email:', err);
+      alert('An error occurred while sending the email.');
+    }
+  };
 
+  const handleSubmitCorrection = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/correct-contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          schoolName: selectedSchool,
+          contactEmail: correctedEmail,
+          contactName: correctedName,
+          contactPhone: correctedPhone
+        })
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('Your correction request has been submitted.');
+        setShowCorrectionForm(false);
+      } else {
+        alert(result.error || 'Failed to submit correction.');
+      }
+    } catch (err) {
+      console.error('Error submitting correction:', err);
+      alert('An error occurred while submitting the correction.');
+    }
+  };
 
   return (
     <div className="container mt-5">
@@ -79,7 +128,7 @@ export default function LoginPage() {
               />
 
               <div className="mb-3">
-                <label className="form-label fw-semibold">Password</label>
+                <label className="form-label fw-semibold">PIN</label>
                 <input
                   type="password"
                   className="form-control"
@@ -94,10 +143,60 @@ export default function LoginPage() {
 
               {error && <div className="alert alert-danger mt-3">{error}</div>}
 
-              <p className="mt-4 text-center">
-                Don't have an account?{' '}
-                <Link to="/request-account">Request one here.</Link>
-              </p>
+              <div className="mt-4">
+                <p>
+                  Your School's PIN will be sent to this email:  <strong>{moeEmail ? maskEmail(moeEmail) : 'xx@xx.xx'}</strong>
+                </p>
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleSendPasswordEmail}
+                  disabled={!moeEmail}
+                >
+                  Email the PIN
+                </button>
+              </div>
+
+              <div className="mt-3">
+                <p>If this email is invalid, Kindly request the PIN on another Valid email </p>
+                <button className="btn btn-link p-0" onClick={() => setShowCorrectionForm(true)}>
+                  Submit New Email
+                </button>
+              </div>
+
+              {showCorrectionForm && (
+                <div className="mt-3">
+                  <div className="mb-3">
+                    <label className="form-label">School’s contact person’s corrected email</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      value={correctedEmail}
+                      onChange={(e) => setCorrectedEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">School’s contact person’s name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={correctedName}
+                      onChange={(e) => setCorrectedName(e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">School’s contact person’s WhatsApp phone number (someone will be contacting you)</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={correctedPhone}
+                      onChange={(e) => setCorrectedPhone(e.target.value)}
+                    />
+                  </div>
+                  <button className="btn btn-primary" onClick={handleSubmitCorrection}>
+                    Submit New Email
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -22,7 +22,13 @@ export default function EditPage() {
           navigate('/main');
           return;
         }
-        setFormData(raw);
+        // Load draft if exists, else use fetched data
+        const draft = localStorage.getItem(`draft_${table}`);
+        if (draft) {
+          setFormData(JSON.parse(draft));
+        } else {
+          setFormData(raw);
+        }
       } catch (err) {
         console.error('Error fetching table data:', err);
         navigate('/main');
@@ -44,6 +50,8 @@ export default function EditPage() {
       });
       const result = await res.json();
       if (result.success) {
+        // Clear draft on successful save
+        localStorage.removeItem(`draft_${table}`);
         alert('Saved successfully!');
         navigate('/main');
       } else {
@@ -52,6 +60,25 @@ export default function EditPage() {
     } catch (err) {
       console.error('Save error:', err);
       alert('An error occurred while saving.');
+    }
+  };
+
+  const handleCancel = async (cancelData) => {
+    try {
+      // Persist partial data to server
+      const school = JSON.parse(localStorage.getItem('school'));
+      const payload = { ...cancelData, school_id: school.id };
+      await fetch(`${API_BASE_URL}/api/${table}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error('Cancel save error:', err);
+    } finally {
+      // Save draft locally and navigate back
+      localStorage.setItem(`draft_${table}`, JSON.stringify(cancelData));
+      navigate('/main');
     }
   };
 
@@ -66,7 +93,7 @@ export default function EditPage() {
               <h4 className="mb-0">Edit: {table.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</h4>
             </div>
             <div className="card-body">
-              <GenericForm tableName={table} initialData={formData} onSubmit={handleSubmit} onCancel={() => navigate('/main')} />
+              <GenericForm tableName={table} initialData={formData} onSubmit={handleSubmit} onCancel={handleCancel} />
             </div>
           </div>
         </div>
