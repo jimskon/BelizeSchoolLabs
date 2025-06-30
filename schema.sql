@@ -444,13 +444,17 @@ CREATE TABLE resources (
 );
 
 -- Table to store pictures uploaded by schools
+
 CREATE TABLE pictures (
   id INT AUTO_INCREMENT PRIMARY KEY,
   school_id INT,
   image_url VARCHAR(255),
   description TEXT,
   uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (school_id) REFERENCES school(id)
+  category VARCHAR(100),
+  file_url TEXT,
+  file_type VARCHAR(100),
+  INDEX (school_id)
 );
 
 -- Table to store current grant status - filled in by administrator
