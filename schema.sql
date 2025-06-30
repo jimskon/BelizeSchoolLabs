@@ -157,7 +157,10 @@ CREATE TABLE school (
     admin_comments TEXT, -- (Only seen by the administrator)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    login_pin VARCHAR(10)
+    pin_expires_at DATETIME;
 );
+
 
 -- School information as originally proveded by the MOE and potentially updated by the principal etc.
 
