@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer');
 
 require('dotenv').config();
 
@@ -20,6 +21,9 @@ app.use('/api/school', require('./dashboard/routes'));
 // Form configuration
 app.use('/api/form-config', require('./utils/formConfigRouter'));
 
+// Pictures routes
+app.use('/api/pictures', require('./pictures/routes'));
+
 // Generic table router for CRUD
 app.use('/api', require('./utils/genericTableRouter'));
 
@@ -35,6 +39,29 @@ app.get('/api/test-db', async (req, res) => {
 });
 
 // Serve static React build
+
+// Setup file storage for uploads
+const upload = multer({ dest: path.join(__dirname, 'uploads') });
+
+// Serve uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Picture upload endpoint
+app.post('/api/pictures/upload', upload.single('file'), async (req, res) => {
+  try {
+    const { category, description } = req.body;
+    const fileUrl = `/uploads/${req.file.filename}`;
+    const fileType = req.file.mimetype;
+    const [result] = await require('./db').query(
+      'INSERT INTO pictures (category, description, file_url, file_type) VALUES (?, ?, ?, ?)',
+      [category, description, fileUrl, fileType]
+    );
+    res.json({ success: true, picture: { id: result.insertId, category, description, file_url: fileUrl, file_type: fileType } });
+  } catch (err) {
+    console.error('Error uploading picture:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 app.use(express.static(path.join(__dirname, '../client/dist')));
 // Fallback to React app for unknown routes
 const indexPath = path.join(__dirname, '../client/dist/index.html');
@@ -50,5 +77,5 @@ app.get(/.*/, (req, res) => {
 const PORT = process.env.PORT || 5000;
 const HOST = '0.0.0.0';
 app.listen(PORT, HOST, () => {
-  console.log(`Server running at http://${process.env.SERVER_HOST || 'localhost'}:${PORT}`);
+  console.log(`Server running at http://${process.env.SERVER_HOST || 'server: '}:${PORT}`);
 });

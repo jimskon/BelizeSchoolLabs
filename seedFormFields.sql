@@ -59,7 +59,7 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
   -- curriculum
   ('curriculum', 'keyboarding',                        'Does your school teach general keyboarding?','dropdown','Yes,No',   6,1,1),
   ('curriculum', 'computer_literacy',                 'Does your school teach computer literacy?','dropdown','Yes,No',   6,1,1),
-  ('curriculum', 'word',                              'Does your school teach word processing such as Microsoft Word, LibreOffice/OpenOffice Write or Google Docs?',              'dropdown','Yes,No',   6,1,1),
+  ('curriculum', 'word',                              'Does your school teach word processing such as Microsoft Word, LibreOffice/OpenOffice Write or Google Docs?', 'dropdown','Yes,No',   6,1,1),
   ('curriculum', 'spread_sheet',                       'Does your school teach spreadsheets such as Excel, LibreOffice Calc, or Google Sheets?', 'dropdown','Yes,No',   6,1,1),
   ('curriculum', 'data_base',                          'Does your school teach about databases such as MS Access, LibreOffice Base, MySQL?', 'dropdown','Yes,No',   6,1,1),
   ('curriculum', 'slide_show',                         'Does your school teach slide show design such as: PowerPoint, LibreOffice Present, Google Slides?', 'dropdown','Yes,No',   6,1,1),
