@@ -444,19 +444,13 @@ CREATE TABLE resources (
 );
 
 -- Table to store pictures uploaded by schools
-
 CREATE TABLE pictures (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    category VARCHAR(50), -- such as 'school_building', 'lab', 'resources', 'students', 'events', 'district_map', 'management_map', 'other'
-    description TEXT,
-    file_url VARCHAR(50),
-    file_type VARCHAR(50),
-    approved_for_adver BOOLEAN, -- Set by the administrator
-
-    comments TEXT,  -- Do you have any comments about the above information
-    admin_comments TEXT, -- (Only seen by the administrator)
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  school_id INT,
+  image_url VARCHAR(255),
+  description TEXT,
+  uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (school_id) REFERENCES school(id)
 );
 
 -- Table to store current grant status - filled in by administrator
