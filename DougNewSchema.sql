@@ -160,7 +160,7 @@ CREATE TABLE moe_school_info (
 	district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
 	locality ENUM ('Rural','Urban'),
 	type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
-	ownership VARCHAR(50), -- (Advantist Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools,
+	ownership VARCHAR(50), -- (Adventits Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools,
 	-- Government Schools, Mennonite Schools - Church Group. Mennonite Schools - H&B, Mennonite Schools - Spanish Lookout,
 	-- Methodist Schools, Nazarene Schools, Presbyterian Schools, Private Schools, U.E.C.B Schools, Other)
 	sector ENUM ('Government', 'Government Aided', 'Private','Specially Assisted'),
@@ -175,9 +175,11 @@ CREATE TABLE moe_school_info (
 -- Table to store individual school
 
 CREATE TABLE school (
-	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school 
+	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school (username in WordPress)
 	name VARCHAR(80), -- Name for this school
 	password VARCHAR(255), -- Generated password/pin sent to specified email
+	school_id INT,  -- An outside integer for use by WordPress to identify the particular school
+
 	answered_filled_out BOOLEAN,  -- Yes, Have you filled out all the answers; or No, I did not know all the answers I will have someone else help me
 	
 	comments TEXT,  -- Do you have any comments about the above information
@@ -190,7 +192,7 @@ CREATE TABLE school (
 
 CREATE TABLE school_info (
 	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
-	name VARCHAR(80), -- This is the name of the school from the MOE and corrected
+	name VARCHAR(80), -- This is the name of the school from the MOE and corrected (Same as in the "school" table)
 
 	address VARCHAR(80), -- School's main address
 	contact_person VARCHAR(50), -- School's contact person (from the MOE)
@@ -205,7 +207,7 @@ CREATE TABLE school_info (
 	district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
 	locality ENUM ('Rural','Urban'),
 	type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
-	ownership VARCHAR(50), -- (Advantist Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools, 
+	ownership VARCHAR(50), -- (Adventits Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools, 
 	-- Government Schools, Mennonite Schools - Church Group. Mennonite Schools - H&B, Mennonite Schools - Spanish Lookout,
 	-- Methodist Schools, Nazarene Schools, Presbyterian Schools, Private Schools, U.E.C.B Schools, Other)
 	sector ENUM ('Government', 'Government Aided', 'Private','Specially Assisted'),
