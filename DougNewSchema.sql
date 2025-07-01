@@ -4,9 +4,14 @@
 Process for reading MOE spreadsheet and getting it into the MySQL moe_school_info table
 
 Convert MOE xlsx file into LibreCalc ODS file.
+
+	Swap the columns so that Code is first then Name
+
+	Replace any missing Codes with 0XXX1, 0XXX2, etc. - To be fixed later
+
 	Remove all columns except in the following order: 
-	    Name    
 	    Code
+	    Name    
 	    Address 
 	    Contact Person  
 	    Telephone   -  These needs hand editing
@@ -15,9 +20,9 @@ Convert MOE xlsx file into LibreCalc ODS file.
 	    Email   
 	    Website 
 	    Year Opened 
-	    Longitude   - can't be blank put a 0 in
-	    Latitude    - can't be blank put a 0 in
-	    Area Administrative Locality    - This becomes 'district' in sql
+	    Longitude
+	    Latitude
+	    Area Administrative Locality  (this becomes 'district' in sql)
 	    Type    
 	    Ownership   
 	    Sector  
@@ -25,16 +30,22 @@ Convert MOE xlsx file into LibreCalc ODS file.
 	    School Administrator 2
 
 	Manually correct each cell especially phone numbers
-	Change bad longitude and lattitude values to 0
+
+	Fix cells that have a CR/LF imbedded in the cells value
+		- You can do this by saving the sheet as a CSV with a ";" 
+		  seperator and look for anomolies then fix in Calc.
+
+	Change missing or bad longitude and lattitude values to 0
 	
 	For each tab do a SaveAs... with the name 
-	            Dir-2025-Preschool
-	            Dir-2025-Primary
-	            Dir-2025-Secondary
-	            Dir-2025-Tertiary
-	            Dir-2025-Vocational
-	            Dir-2025-AdultContinuing
-	            Dir-2025-University
+	        Dir-2025-Preschool
+	        Dir-2025-Primary
+	        Dir-2025-Secondary
+        	Dir-2025-Tertiary
+	        Dir-2025-Vocational
+	        Dir-2025-AdultContinuing
+	        Dir-2025-University
+	        Dir-2025-Testing
 	    Text CSV
 	    Click Edit File Settings
 	    Field delimiter ;
@@ -42,34 +53,36 @@ Convert MOE xlsx file into LibreCalc ODS file.
 	    Click Save cell content as shown
 	    All else NOT clicked
 
-	Load the schema.db into phpmyadmin
+	Load the following schema into phpmyadmin
 
 	sudo mysql
 	    USE Belize_Project;
 	    WARNINGS;
-	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Preschool.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Primary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Secondary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Tertiary.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Vocational.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Preschool.csv'       INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Primary.csv'         INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Secondary.csv'       INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Tertiary.csv'        INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Vocational.csv'      INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
 	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-AdultContinuing.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-University.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-University.csv'      INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Testing.csv'         INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
 
 	    Load the additional MOE spreadsheet info Giga Connected Schools and Code Dot Org schools
 
-	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-CodeDotOrg.csv' INTO TABLE moe_code_org FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-GigaFromMOE.csv' INTO TABLE moe_giga_connected FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;    
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-CodeDotOrg.csv'      INTO TABLE moe_code_org FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-GigaFromMOE.csv'     INTO TABLE moe_giga_connected FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;    
 
-	    -- TESTING: The Testing.csv file has our testing mock schools in it - - - -
-	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Testing.csv' INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+	    -- TESTING: The Dir-2025-Testing.csv file has our testing mock schools in it - - - -
 
-	    WARNING! - Check each database table to ensure the data is correct. If a cell in the original spread sheet has a CR in it some rows will be screwed up
+	    LOAD DATA LOCAL INFILE '/home/doug/Downloads/Dir-2025-Testing.csv'         INTO TABLE moe_school_info FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
 
-	    Set created_at which by inference sets updated_at      
+	    WARNING! - Check each database table to ensure the data is correct. If a cell in the original spread sheet has a CR in rows will be screwed up
+
+	    Set created_at which by inference sets updated_at
 
 	    UPDATE `moe_school_info` SET created_at = CURRENT_TIMESTAMP;
 	    UPDATE `moe_giga_connected` SET created_at = CURRENT_TIMESTAMP;
-	    UPDATE `moe_code_org` SET created_at = CURRENT_TIMESTAMP;        
+	    UPDATE `moe_code_org` SET created_at = CURRENT_TIMESTAMP;
 
 	    -- SQL to prefill the school_info and school tables from the moe_school_info table
 
@@ -82,8 +95,6 @@ Convert MOE xlsx file into LibreCalc ODS file.
 	    FROM moe_school_info;
 
 	    INSERT INTO school (code, name) SELECT code, name FROM moe_school_info;
-
-
 */
 
 -- Drop old and Create the database if it doesn't exist
