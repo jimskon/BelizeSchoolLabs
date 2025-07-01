@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 30, 2025 at 10:40 PM
+-- Generation Time: Jul 01, 2025 at 02:27 PM
 -- Server version: 10.5.26-MariaDB-ubu2004
 -- PHP Version: 7.4.3-4ubuntu2.29
 
@@ -57,7 +57,8 @@ CREATE TABLE `computerRoom` (
 --
 
 CREATE TABLE `contact_corrections` (
-  `code` varchar(10) NOT NULL,
+  `id` int(11) NOT NULL,
+  `code` varchar(10) DEFAULT NULL,
   `school_name` varchar(100) NOT NULL,
   `district` enum('Belize','Cayo','Corozal','Orange Walk','Stann Creek','Toledo') DEFAULT NULL,
   `type` enum('Preschool','Primary','Secondary','Tertiary','Vocational','Adult and Continuing','University') DEFAULT NULL,
@@ -124,6 +125,7 @@ CREATE TABLE `demographics` (
   `minutes_drive_from_road` int(11) DEFAULT NULL,
   `power_stability` int(11) DEFAULT NULL,
   `has_pta` tinyint(1) DEFAULT NULL,
+  `has_computers` tinyint(1) DEFAULT NULL,
   `has_internet` tinyint(1) DEFAULT NULL,
   `number_of_classrooms_with_internet` int(11) DEFAULT NULL,
   `internet_provider` varchar(50) DEFAULT NULL,
@@ -1207,7 +1209,8 @@ INSERT INTO `moe_school_info` (`code`, `name`, `address`, `contact_person`, `tel
 --
 
 CREATE TABLE `pictures` (
-  `code` varchar(10) NOT NULL,
+  `id` int(11) NOT NULL,
+  `code` varchar(10) DEFAULT NULL,
   `category` varchar(50) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `file_url` varchar(50) DEFAULT NULL,
@@ -1943,7 +1946,8 @@ INSERT INTO `school` (`code`, `name`, `password`, `answered_filled_out`, `commen
 --
 
 CREATE TABLE `school_grant_status` (
-  `code` varchar(10) NOT NULL,
+  `id` int(11) NOT NULL,
+  `code` varchar(10) DEFAULT NULL,
   `status` enum('more info needed','pending_phone_call','pending site visit','pending final approval','approved for advertising','granted','pending shipment','pending installation','installed') DEFAULT NULL,
   `number_of_computers` int(11) DEFAULT NULL,
   `type_of_computers` varchar(50) DEFAULT NULL,
@@ -2659,21 +2663,6 @@ INSERT INTO `school_info` (`code`, `name`, `address`, `contact_person`, `telepho
 ('U90002', 'University of Belize ( various Faculties and campuses)', 'Belmopan (Belize City, Punta Gorda, Central Farm)', 'Alan Slusher', '822-1000', '', '', '', '', 2000, -88.7613, 17.2446, 'Cayo', 'Urban', 'University', 'Community Schools', 'Specially Assisted', '', '', NULL, NULL, NULL, NULL, NULL, '2025-06-30 22:30:49', '2025-06-30 22:30:49'),
 ('U90003', 'University of the West Indies School of Continuing Studies', 'Belize City', 'Jane Bennett (Resident Tutor)', '223-0484', '', '', '', '', 0, 0, 0, 'Belize', 'Urban', 'University', 'Private Schools', 'Specially Assisted', '', '', NULL, NULL, NULL, NULL, NULL, '2025-06-30 22:30:49', '2025-06-30 22:30:49');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `titles`
---
-
-CREATE TABLE `titles` (
-  `id` int(11) NOT NULL,
-  `table_name` varchar(50) DEFAULT NULL,
-  `title` text DEFAULT NULL,
-  `subtitle` text DEFAULT NULL,
-  `instructions` text DEFAULT NULL,
-  `footer` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 --
 -- Indexes for dumped tables
 --
@@ -2688,7 +2677,7 @@ ALTER TABLE `computerRoom`
 -- Indexes for table `contact_corrections`
 --
 ALTER TABLE `contact_corrections`
-  ADD PRIMARY KEY (`code`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `curriculum`
@@ -2742,7 +2731,7 @@ ALTER TABLE `moe_school_info`
 -- Indexes for table `pictures`
 --
 ALTER TABLE `pictures`
-  ADD PRIMARY KEY (`code`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `resources`
@@ -2760,7 +2749,7 @@ ALTER TABLE `school`
 -- Indexes for table `school_grant_status`
 --
 ALTER TABLE `school_grant_status`
-  ADD PRIMARY KEY (`code`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `school_info`
@@ -2769,14 +2758,14 @@ ALTER TABLE `school_info`
   ADD PRIMARY KEY (`code`);
 
 --
--- Indexes for table `titles`
---
-ALTER TABLE `titles`
-  ADD PRIMARY KEY (`id`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `contact_corrections`
+--
+ALTER TABLE `contact_corrections`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `form_fields`
@@ -2785,9 +2774,15 @@ ALTER TABLE `form_fields`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `titles`
+-- AUTO_INCREMENT for table `pictures`
 --
-ALTER TABLE `titles`
+ALTER TABLE `pictures`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `school_grant_status`
+--
+ALTER TABLE `school_grant_status`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
