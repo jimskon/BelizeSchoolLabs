@@ -246,16 +246,58 @@ export default function HomePage() {
           <Modal.Title>{modalPic && modalPic.description}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center">
-          <img
-            src={modalPic && `${API_BASE_URL}${modalPic.file_url}`}
-            alt={modalPic && modalPic.description}
-            className="img-fluid"
-          />
+          {editingPictureId === modalPic?.id ? (
+            <div>
+              <div className="mb-3 text-start">
+                <label className="form-label">Category</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={editingCategory}
+                  onChange={(e) => setEditingCategory(e.target.value)}
+                />
+              </div>
+              <div className="mb-3 text-start">
+                <label className="form-label">Description</label>
+                <textarea
+                  className="form-control"
+                  rows="2"
+                  value={editingDescription}
+                  onChange={(e) => setEditingDescription(e.target.value)}
+                ></textarea>
+              </div>
+            </div>
+          ) : (
+            <img
+              src={modalPic && `${API_BASE_URL}${modalPic.file_url}`}
+              alt={modalPic && modalPic.description}
+              className="img-fluid"
+            />
+          )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
+          {editingPictureId === modalPic?.id ? (
+            <>
+              <Button variant="primary" onClick={() => handleSaveEdit(modalPic.id)}>
+                Save
+              </Button>
+              <Button variant="secondary" onClick={handleCancelEdit}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="warning" onClick={() => handleEditClick(modalPic)}>
+                Edit
+              </Button>
+              <Button variant="danger" onClick={() => { handleDelete(modalPic.id); setShowModal(false); }}>
+                Delete
+              </Button>
+              <Button variant="secondary" onClick={() => setShowModal(false)}>
+                Close
+              </Button>
+            </>
+          )}
         </Modal.Footer>
       </Modal>
     </div>

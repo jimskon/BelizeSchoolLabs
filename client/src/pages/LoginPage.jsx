@@ -5,8 +5,9 @@ import SchoolSelector from '../components/SchoolSelector';
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export default function LoginPage() {
-  const [selectedSchool, setSelectedSchool] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedSchool, setSelectedSchool] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showCorrectionForm, setShowCorrectionForm] = useState(false);
@@ -53,10 +54,9 @@ export default function LoginPage() {
     const data = await res.json();
     if (res.ok && data.success) {
       const schoolSession = { id: data.schoolId, name: selectedSchool };
-
       localStorage.setItem('school', JSON.stringify(schoolSession));
       if (data.needsValidation) {
-        navigate(`/validate?name=${encodeURIComponent(selectedSchool)}`)
+        navigate(`/validate?name=${encodeURIComponent(selectedSchool)}`);
       } else if (data.needsPasswordReset) {
         navigate('/reset-password');
       } else {
@@ -121,81 +121,111 @@ export default function LoginPage() {
             </div>
             <div className="card-body">
               <SchoolSelector
-                selectedSchool={selectedSchool}
-                setSelectedSchool={setSelectedSchool}
                 selectedDistrict={selectedDistrict}
                 setSelectedDistrict={setSelectedDistrict}
+                selectedType={selectedType}
+                setSelectedType={setSelectedType}
+                selectedSchool={selectedSchool}
+                setSelectedSchool={setSelectedSchool}
               />
 
-              <div className="mb-3">
-                <label className="form-label fw-semibold">PIN</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-
-              <button className="btn btn-primary w-100" onClick={handleLogin}>
-                Login
-              </button>
-
-              {error && <div className="alert alert-danger mt-3">{error}</div>}
-
-              <div className="mt-4">
-                <p>
-                  Your School's PIN will be sent to this email:  <strong>{moeEmail ? maskEmail(moeEmail) : 'xx@xx.xx'}</strong>
-                </p>
-                <button
-                  className="btn btn-secondary"
-                  onClick={handleSendPasswordEmail}
-                  disabled={!moeEmail}
-                >
-                  Email the PIN
-                </button>
-              </div>
-
-              <div className="mt-3">
-                <p>If this email is invalid, Kindly request the PIN on another Valid email </p>
-                <button className="btn btn-link p-0" onClick={() => setShowCorrectionForm(true)}>
-                  Submit New Email
-                </button>
-              </div>
-
-              {showCorrectionForm && (
-                <div className="mt-3">
-                  <div className="mb-3">
-                    <label className="form-label">School’s contact person’s corrected email</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      value={correctedEmail}
-                      onChange={(e) => setCorrectedEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">School’s contact person’s name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={correctedName}
-                      onChange={(e) => setCorrectedName(e.target.value)}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">School’s contact person’s WhatsApp phone number (someone will be contacting you)</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={correctedPhone}
-                      onChange={(e) => setCorrectedPhone(e.target.value)}
-                    />
-                  </div>
-                  <button className="btn btn-primary" onClick={handleSubmitCorrection}>
-                    Submit New Email
-                  </button>
+              {!selectedSchool && (
+                <div className="alert alert-info mt-3">
+                  Please select a district, type, and school to continue.
                 </div>
+              )}
+
+              {selectedSchool && (
+                <>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">PIN</label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+
+                  <button
+                    className="btn btn-primary w-100"
+                    onClick={handleLogin}
+                    disabled={!password}
+                  >
+                    Login
+                  </button>
+
+                  {error && <div className="alert alert-danger mt-3">{error}</div>}
+
+                  <div className="mt-4">
+                    <p>
+                      Your School's PIN will be sent to this email:{' '}
+                      <strong>
+                        {moeEmail ? maskEmail(moeEmail) : 'xx@xx.xx'}
+                      </strong>
+                    </p>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={handleSendPasswordEmail}
+                      disabled={!moeEmail}
+                    >
+                      Email the PIN
+                    </button>
+                  </div>
+
+                  <div className="mt-3">
+                    <p>
+                      If this email is invalid, kindly request the PIN on another valid email
+                    </p>
+                    <button
+                      className="btn btn-link p-0"
+                      onClick={() => setShowCorrectionForm(true)}
+                    >
+                      Submit New Email
+                    </button>
+                  </div>
+
+                  {showCorrectionForm && (
+                    <div className="mt-3">
+                      <div className="mb-3">
+                        <label className="form-label">
+                          School’s contact person’s corrected email
+                        </label>
+                        <input
+                          type="email"
+                          className="form-control"
+                          value={correctedEmail}
+                          onChange={(e) => setCorrectedEmail(e.target.value)}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label">
+                          School’s contact person’s name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={correctedName}
+                          onChange={(e) => setCorrectedName(e.target.value)}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label">
+                          School’s contact person’s WhatsApp phone number (someone will be contacting you)
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={correctedPhone}
+                          onChange={(e) => setCorrectedPhone(e.target.value)}
+                        />
+                      </div>
+                      <button className="btn btn-primary" onClick={handleSubmitCorrection}>
+                        Submit New Email
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
