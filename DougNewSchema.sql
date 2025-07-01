@@ -252,7 +252,7 @@ CREATE TABLE demographics (
 
    -- Internet and Computer Section
 
-	has_computers BOOLEN, -- Does your school have computers, tablets, or laptops for the students to learn on
+	has_computers BOOLEAN, -- Does your school have computers, tablets, or laptops for the students to learn on
 	has_internet BOOLEAN, -- Does your school have Internet access (yes, no)
 
 	-- Ask the following if they have internet (if not then force fill the fields with NULL, 0, etc)
@@ -459,7 +459,7 @@ CREATE TABLE resources (
 -- Table to store pictures uploaded by schools
 
 CREATE TABLE pictures (
-	id PRIMARY KEY AUTO_INCREMENT,
+	id INT PRIMARY KEY AUTO_INCREMENT,
 	code VARCHAR(10), -- MOE's code for each school
 
 	category VARCHAR(50), -- such as 'school_building', 'lab', 'resources', 'students', 'events', 'district_map', 'management_map', 'other'
@@ -477,7 +477,7 @@ CREATE TABLE pictures (
 -- Table to store current grant status - filled in by administrator
 
 CREATE TABLE school_grant_status (
-	id PRIMARY KEY AUTO_INCREMENT,
+	id INT PRIMARY KEY AUTO_INCREMENT,
 	code VARCHAR(10), -- MOE's code for each school
 	
 	status ENUM ('more info needed', 'pending_phone_call', 'pending site visit', 'pending final approval', 'approved for advertising', 'granted', 'pending shipment', 'pending installation', 'installed'),
@@ -510,8 +510,8 @@ CREATE TABLE form_fields (
 -- Table to hold the correction requests -- Admin can go in and then correct
 
 CREATE TABLE contact_corrections (
-	id PRIMARY KEY AUTO_INCREMENT,
-	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	code VARCHAR(10), -- MOE's code for each school
 	school_name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
 	district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
 	type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
@@ -576,6 +576,7 @@ CREATE TABLE management (
 -- Table to store staff details (teachers, managers, district representative)
 
 CREATE TABLE school_staff (
+	id INT PRIMARY KEY AUTO_INCREMENT,
 	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
 
 	person VARCHAR(50), -- name of staff person
@@ -599,6 +600,7 @@ CREATE TABLE school_staff (
 -- Table for managing staff laptops
 
 CREATE TABLE school_staff_laptop (
+	id INT PRIMARY KEY AUTO_INCREMENT,
 	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
 
 	brand VARCHAR(50),
