@@ -1,0 +1,175 @@
+-- Seed script for form_fields table for school_info, demographics, curriculum, computerRoom, and resources
+
+INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_width, required, visible) VALUES
+
+	-- school_info
+
+	('school_info',		'code',							'MOE School Code',								'text',			NULL,		6,1,0),
+	('school_info',		'name',							'Schools Name',									'text',			NULL,		6,1,1),
+
+	('school_info',		'address',						'School Address',								'text',			NULL,		12,1,1),
+	('school_info',		'contact_person',				'School Main Contact Person',					'text',			NULL,		6,1,1),
+	('school_info',		'telephone',					'Contact Persons Phone',						'phone',		NULL,		6,1,1),
+	('school_info',		'telephone_alt1',				'First Alternate Phone Number',					'phone',		NULL,		6,0,1),
+	('school_info',		'telephone_alt2',				'Second Alternate Phone Number',				'phone',		NULL,		6,0,1),
+	('school_info',		'email',						'School Main Contact Person email',				'email',		NULL,		6,1,1),
+
+	('school_info',		'website',						'School Website',								'text',			NULL,		6,0,1),
+	('school_info',		'year_opened',					'Year School Opened',							'num(1850-2050)', NULL,		6,0,1),
+	('school_info',		'longitude',					'Longitude',									'text',			NULL,		6,0,1),
+	('school_info',		'latitude',						'Latitude',										'text',			NULL,		6,0,1),
+	('school_info',		'district',						'District',										'dropdown',		'Belize,Cayo,Corozal,Orange Walk,Stann Creek,Toledo',	6,1,1),
+	('school_info',		'locality',						'Locality',										'dropdown',		'Rural,Urban',	6,1,1),
+	('school_info',		'type',							'School Type',									'dropdown',		'Preschool,Primary,Secondary,Tertiary,Vocational,Adult and Continuing,University',	6,1,1),
+	('school_info',		'ownership',					'Ownership',									'dropdown',		'Adventist Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools, Government Schools, Mennonite Schools - Church Group. Mennonite Schools - H&B, Mennonite Schools - Spanish Lookout, Methodist Schools, Nazarene Schools,Presbyterian Schools, Private Schools, U.E.C.B Schools, Other',		6,0,1),
+	('school_info',		'sector',						'Sector',										'dropdown',		'Government,Government Aided,Private,Specially Assisted',	6,1,1),
+	('school_info',		'administrator_1',				'Administrator 1',								'text',			NULL,		6,0,1),
+	('school_info',		'administrator_2',				'Administrator 2',								'text',			NULL,		6,0,1),
+	('school_info',		'email_1',						'First Alternate Contact Person email',			'email',		NULL,		6,0,1),
+	('school_info',		'email_2',						'Second Alternate Contact Person email',		'email',		NULL,		6,0,1),
+	('school_info',		'comments',						'Comments about the above intormation',			'text',			NULL,		12,0,1),
+
+
+	-- demographics
+
+	('demographics',	'principals_name',				'Principal Name',								'text',			NULL,		6,1,1),
+	('demographics',	'principals_telephone',			'Principal’s phone number (WhatsApp preferred)','phone',		NULL,		6,1,1),
+	('demographics',	'principals_email',				'Principal’s email address',					'email',		NULL,		6,1,1),
+
+	-- Social media section
+
+	('demographics',	'facebook',						'Schools Facebook URL',							'text',			NULL,		6,1,1),
+
+	-- Teacher, student, building and classroom section
+
+	('demographics',	'number_of_students',			'Total number of students in your school',						'num(0-700)',	NULL,		6,1,1),
+	('demographics',	'number_of_teachers',			'Number of teachers (full or part-time)',						'num(0-700)',	NULL,		6,1,1),
+	('demographics',	'largest_class_size',			'Number of students in your largest classroom',					'num(0-40)',	NULL,		6,0,1),
+	('demographics',	'number_of_buildings',			'Number of non-storage buildings at your school',				'num(0-8)', 	NULL,		6,0,1),
+	('demographics',	'number_of_classrooms',			'Number of classrooms in your school',							'num(0-8)', 	NULL,		6,0,1),
+	('demographics',	'number_of_computer_labs',		'Number of computer labs / rooms in your school',				'dropdown',		'0,1,2,3+',	6,0,1),
+
+	('demographics',	'minutes_drive_from_road',		'How many minutes drive is your school from the main road?',	'num(0-120)', 	NULL,		6,1,1),
+	('demographics',	'power_stability',				'Power Outages Per Week',										'num(0-168)',	NULL,		6,1,1),
+	('demographics',	'has_pta',						'Has PTA/Support Group?',										'dropdown',		'Yes,No',	6,1,1),
+
+	-- Internet and Computer Section
+
+	('demographics',	'has_computers',				'Does your school have computers, tablets, or laptops for the students to learn on?', 'dropdown',	'Yes,No',	6,1,1),
+	('demographics',	'has_internet',					'Does your school have Internet access?',						'dropdown',		'Yes,No',	6,1,1), 
+	('demographics',	'has_technician',				'Does your school have a technician to repair computers?',		'dropdown',		'Yes,No',	6,1,1), 
+
+	-- Ask the following if they have internet (if not then force fill the fields with NULL, 0, etc)
+
+	('demographics',	'internet_classrooms',			'Number of classrooms with Internet or WiFi',					'num(0-10)',	NULL,		6,1,1),
+	('demographics',	'internet_provider',			'Internet Provider',											'text',			NULL,		6,0,1),
+	('demographics',	'internet_speed',				'Internet Speed (Mbps)',										'num(0-250)', 	NULL,		6,0,1),
+	('demographics',	'internet_method',				'Internet Connection Method',									'text',			NULL,		6,0,1),
+	('demographics',	'internet_stability',			'Internet Stability',											'text',			NULL,		6,0,1),
+
+	-- General computer section
+
+-- -------------------------------------------------------------------------------------------------
+
+	('demographics',	'teachers_with_laptops',		'How many of your teachers own laptops?',						'num(0-40)',	NULL,		6,0,1),
+	('demographics',	'full_time_IT_teachers',		'Number of Full-Time IT Teachers',								'num(0-4)',		NULL,		6,0,1),
+	('demographics',	'teachers_that_also_teach_IT',	'Teachers Also Teaching IT',									'num(0-10)',	NULL,		6,0,1),
+
+	-- If they have an IT teacher of either IT type is > 0 then ask the following. If the have an IT teacher then word this question as:  “... IT teacher …” else word it as “... main teacher that teaches IT..”.
+
+	('demographics',	'main_IT_teacher_name',			'Main IT Teacher Name',											'text',			NULL,		6,0,1),
+	('demographics',	'main_IT_teacher_phone',		'Main IT Teacher Phone',										'phone',		NULL,		6,0,1),
+	('demographics',	'main_IT_teacher_email',		'Main IT Teacher Email',										'email',		NULL,		6,0,1),
+
+	-- For the percentages below make a dropdown to fill in the INT (less than 20%, 20% - 40%, 40% - 60%, 60% - 80%, 80%+)
+
+	('demographics',	'students_own_computers',		'Percentage of Students with Computers',						'num(0-100)',	NULL,		6,0,1),
+	('demographics',	'students_access_computers',	'Percentage of Students with Computer Access',					'num(0-100)',	NULL,		6,0,1),
+	('demographics',	'students_phones',				'Percentage of Students Using Phones for School Work',			'num(0-100)',	NULL,		6,0,1),
+
+	('demographics',	'comments',						'Additional Comments',											'text',			NULL,		12, 0,	1),
+
+
+	-- curriculum
+
+	('curriculum',		'keyboarding',					'Does your school teach general keyboarding?',					'dropdown',		'Yes,No',	6,1,1),
+	('curriculum',		'computer_literacy',			'Does your school teach computer literacy?',					'dropdown',		'Yes,No',	6,1,1),
+	('curriculum',		'word',							'Does your school teach word processing such as Microsoft Word, LibreOffice/OpenOffice Write or Google Docs?',	'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'spread_sheet',					'Does your school teach spreadsheets such as Excel, LibreOffice Calc, or Google Sheets?',						'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'data_base',					'Does your school teach about databases such as MS Access, LibreOffice Base, MySQL?',							'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'slide_show',					'Does your school teach slide show design such as: PowerPoint, LibreOffice Present, Google Slides?',			'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'google_workspace',				'Does your school also teach Google Workspace such as Google Docs, Sheets, etc.?',								'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'software_suite',				'Which software suite does your school prefer?','dropdown','Do not know,Microsoft Office,LibreOffice,OpenOffice,Google WorkSpace,Both Office and Workspace',6,0,1),
+	('curriculum',		'cloud_based_learning_tools',	'Does your school use other learning websites such as typing, spelling, math, etc.?',							'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'graphics_design',				'Does your school teach graphics design tools such as Photoshop, Illustrator, Publisher, Canva, PosterMyWall or equivalent?',		'dropdown','Yes,No',	6,1,1),
+
+	('curriculum',		'graphics_animation',			'Does your school teach graphics animation such as Blender or equivalent?',	'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'graphics_cad_program',			'Does your school teach graphics CAD tools such as AutoCad or equivalent?',	'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'robotics',						'Does your school teach robotics?',											'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'code_dot_org',					'Does your school use code.org?',											'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'khan_accadamy',				'Does your school use Khan Academy or similar online learning platforms?',	'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'other_on_liine_local_education_tools','Other educational websites?',										'text', 	NULL,		6,0,1),
+	('curriculum',		'formal_curriculum',			'What formal computer related curriculum does your school use if any?',		'text',		NULL,		6,0,1),
+	('curriculum',		'local_curriculum',				'What locally generated computer related curriculum does your school use?',	'text',		NULL,		6,0,1),
+	('curriculum',		'rachel_server',				'Does your school participate in the Rachel server project?',				'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'other',						'What other computer related teaching tools do you use?',					'text',		NULL,		12,0,1),
+	('curriculum',		'comments',						'Do you have any comments about the above information',						'text',		NULL,		12,0,1),
+
+	-- computerRoom
+
+	('computerRoom',	'wired_for_lab',				'Has your computer room been wired expressly for a computer lab?',							'dropdown',		'Yes,No',	6,1,1),
+	('computerRoom',	'electrical',					'Does your computer room have a dedicated electrical service panel in the computer room?',	'dropdown',		'Yes,No', 	6,1,1),
+	('computerRoom',	'electrical_ground',			'Is there a quality ground wire connected to a ground rod?',								'dropdown',		'Yes,No',	6,1,1),
+	('computerRoom',	'electrical_outlets',			'How many electrical outlets are in the computer room?',									'num(0-100)',	NULL,		6,1,1),
+	('computerRoom',	'air_condition',				'How many working air conditioners does your computer lab have?',							'num(0-50)',	NULL,		6,1,1),
+	('computerRoom',	'partition_security',			'Are all 4 walls in your computer room concrete including the partition to the next room?',	'dropdown',		'Yes,No',	6,1,1),
+	('computerRoom',	'ceiling_secure',				'Is your computer lab ceiling constructed of concrete or steel with no open spaces and secured from a thief climbing over the partitioned wall?',		'dropdown','Yes,No',	6,1,1),
+	('computerRoom',	'windows_secure',				'Are all the windows removed and blocked, or have strong burglar bars installed?',			'dropdown',		'Yes,No',	6,1,1),
+	('computerRoom',	'lighting',						'Is the lighting in your computer room sufficient (even when all windows are blocked)?',	'dropdown',		'Yes,No',	6,1,1),
+	('computerRoom',	'location',						'Is your computer room located at the end of your building (i.e. with 3 outside walls)?',	'dropdown',		'Yes,No',	6,1,1),
+	('computerRoom',	'location_floor',				'Is your computer room located on the first floor?',										'dropdown',		'Yes,No',	6,1,1),
+	('computerRoom',	'comments',						'Do you have any comments about the above information',										'text',			NULL,		12,0,1),
+
+	-- resources
+
+	-- Ask the following if resources.number_of_computer_labs > 0
+
+	('resources',		'principals_computer',	'Does the principal have a non-rented good working computer?',				'dropdown',		'Yes,No',	6,1,1),
+	('resources',		'number_seats', 		'How many student computer stations can your lab accommodate?',				'num(1-40)',	NULL,	6,1,1),
+	('resources',		'desktop_working',		'How many working desktop computers does your main school lab / room have?','num(1-40)',	NULL,	6,1,1),
+	('resources',		'desktop_not_working',	'How many non-working desktops do you have? Some people have reported a non-working desktop when the problem is the keyboard or mouse.','num(0-40)',	NULL,	6,1,1),
+
+	-- has been that the monitor, keyboard or mouse is what is actually broken. Please report here the actual desktop.
+
+	('resources',		'desktop_age',			'Estimate how old your desktops are in years?',								'num(1-20)',	NULL,	6,1,1),
+	('resources',		'desktop_ownership',	'Approximately how long have you had your desktops in years?',				'num(1-20)',	NULL,	6,1,1),
+
+	('resources',		'desktop_monitors',		'How many working monitors does your main school lab / room have?',			'num(1-40)',	NULL,	6,1,1),
+	('resources',		'desktop_keyboards',	'How many working keyboards does your main school lab / room have?',		'num(1-40)',	NULL,	6,1,1),
+	('resources',		'desktop_mice',			'How many working mice does your main school lab / room have?',				'num(1-40)',	NULL,	6,1,1),
+	('resources',		'desktop_comments',		'Please enter any comments you may have about the reliability and usefulness of your desktop computers.',	'text',		NULL,		12,0,1),
+
+	-- End of if resources.number_of_computer_labs > 0
+
+	('resources',		'chromebooks_working',	'How many working chromebooks does your school have?',						'num(0-40)',	NULL,	6,1,1),
+	('resources',		'chromebooks_broken',	'How many chromebooks broke within their first two years?',					'num(0-40)',	NULL,	6,1,1),
+	('resources',		'chromebooks_lost',		'How many chromebooks were lost or stolen in their first two years?',		'num(0-40)',	NULL,	6,1,1),
+	('resources',		'chromebooks_comments',	'Please enter any comments you may have about the reliability and usefulness of the chromebooks.',			'text',		NULL,		12,0,1),
+
+	('resources',		'tablets_working',		'How many working tablets does your school have?',							'num(0-40)',	NULL,	6,1,1),
+	('resources',		'tablets_broken',		'How many tablets broke within their first two years?',						'num(0-40)',	NULL,	6,1,1),
+	('resources',		'tablets_lost',			'How many tablets were lost or stolen in their first two years?',			'num(0-40)',	NULL,	6,1,1),
+	('resources',		'tablets_comments',		'Please enter any comments you may have about the reliability and usefulness of your tablets.',				'text',		NULL,		12,0,1),
+
+	('resources',		'old_computers_work',	'What do you plan to do with your old computers and tablets that still work?',	'text',		NULL,		12,0,1),
+	('resources',		'old_computers_broken',	'What do you plan to do with your broken computers and tablets?',				'text',		NULL,		12,0,1),
+
+	('resources',		'comments',				'Do you have any comments about the above information',						'text',		NULL,		12,0,1)
+
+ON DUPLICATE KEY UPDATE
+	prompt = VALUES(prompt),
+	type = VALUES(type),
+	valuelist = VALUES(valuelist),
+	field_width = VALUES(field_width),
+	required = VALUES(required),
+	visible = VALUES(visible);

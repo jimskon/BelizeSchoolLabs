@@ -248,6 +248,7 @@ CREATE TABLE demographics (
 	number_of_buildings INT, -- Number of buildings at your school (not including storage buildings)
 	number_of_classrooms INT, -- Number of classrooms in your school
 	number_of_computer_labs INT,-- Number of computer labs / rooms in your school (0,1,2,3+)
+
 	minutes_drive_from_road INT, -- How many minutes drive is your school from the main road?
 	power_stability INT, -- Number of times per week the school’s power goes out (0, 1, 2, 3, 4, 5+)
 	has_pta BOOLEAN, -- Does your school have a PTA or group to help with funding?
@@ -256,20 +257,21 @@ CREATE TABLE demographics (
 
 	has_computers BOOLEAN, -- Does your school have computers, tablets, or laptops for the students to learn on
 	has_internet BOOLEAN, -- Does your school have Internet access (yes, no)
+	has_technician BOOLEAN, -- Does your school have a technician that can repair computers
 
 	-- Ask the following if they have internet (if not then force fill the fields with NULL, 0, etc)
 
-	number_of_classrooms_with_internet INT, -- Number of classrooms with Internet or WiFi
+	internet_classrooms INT, -- Number of classrooms with Internet or WiFi
 	internet_provider VARCHAR(50), -- Internet provider (e.g. 'DigiNet', 'NextGen', 'Other')
 	internet_speed ENUM ('Don’t know', '10 to 49 Mbps', '50 to 99 Mbps', '100 to 249 Mbps', '250 to 500 Mbps'),  --  Internet speed in Mbps 
-	connection_method VARCHAR(50), -- Internet connection method (‘Fiber’, ‘Cable’, ‘Wireless ISP’, ‘Hot Spot’, ‘Other’),
+	internet_method VARCHAR(50), -- Internet connection method (‘Fiber’, ‘Cable’, ‘Wireless ISP’, ‘Hot Spot’, ‘Other’),
 	internet_stability ENUM ('Very stable', 'Mostly OK','Comes in and out','Unstable'), -- Describe the Internet stability when all students are using the computer lab, laptops, and Chromebooks  –  
 
 	-- General computer section
 
-	number_of_teachers_that_have_laptops INT, -- How many of your teachers own laptops?
-	number_of_full_time_IT_teachers INT, -- Number of full-time IT teachers
-	number_of_teachers_that_also_teach_IT INT, -- Number of teachers who also teach IT
+	teachers_with_laptops INT, -- How many of your teachers own laptops?
+	full_time_IT_teachers INT, -- Number of full-time IT teachers
+	teachers_that_also_teach_IT INT, -- Number of teachers who also teach IT
 
 	-- If they have an IT teacher of either IT type is > 0 then ask the following. If the have an IT teacher then word this question as:  “... IT teacher …” else word it as “... main teacher that teaches IT..”.
 
@@ -279,9 +281,9 @@ CREATE TABLE demographics (
 
 	-- For the percentages below make a dropdown to fill in the INT (less than 20%, 20% - 40%, 40% - 60%, 60% - 80%, 80%+)
 
-	percentage_of_students_who_have_personal_computers INT, -- Estimate of the percentage of your students who own computers
-	students_computers_outside_school INT, -- Estimate of the percentage of your  students who have access to computers outside of school
-	students__phones_for_school_work  INT, -- Estimate of the percentage of your students who use phones for their school work
+	students_own_computers INT, -- Estimate of the percentage of your students who own computers
+	students_access_computers INT, -- Estimate of the percentage of your  students who have access to computers outside of school
+	students_phones  INT, -- Estimate of the percentage of your students who use phones for their school work
 
 	comments TEXT,  -- Do you have any comments about the above information
 	admin_comments TEXT, -- (Only seen by the administrator)
@@ -423,10 +425,11 @@ CREATE TABLE resources (
 
 	-- Ask the following if resources.number_of_computer_labs > 0
 
+	principals_computer BOOLEAN, -- Does the principal have a non-rented good working computer? 
 	number_seats INT, -- How many student computer stations can your lab accommodate?
-
 	desktop_working INT, --  How many working desktop computers does your main school lab / room have?   
-	desktop_not_working INT, --  How many non-working desktops do you have?  Some people have reported a non-working desktop when the problem 
+	desktop_not_working INT, --  How many non-working desktops do you have?  Some people have reported a non-working desktop when the problem is the keyboard or mouse.
+
 	-- has been that the monitor, keyboard or mouse is what is actually broken. Please report here the actual desktop.
 
 	desktop_age INT, -- Estimate how old your desktops are in years?
