@@ -14,14 +14,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Upload a picture associated with a school code
 router.post('/upload-picture', upload.single('image'), async (req, res) => {
-  const { school_id, description } = req.body;
+  const { code, description } = req.body;
+  if (!code) return res.status(400).json({ success: false, error: 'Missing school code' });
   const image_url = `/uploads/${req.file.filename}`;
 
   try {
     await pool.query(
-      'INSERT INTO pictures (school_id, image_url, description) VALUES (?, ?, ?)',
-      [school_id, image_url, description]
+      'INSERT INTO pictures (code, file_url, description) VALUES (?, ?, ?)',
+      [code, image_url, description]
     );
     res.json({ success: true, image_url });
   } catch (error) {
@@ -30,12 +32,17 @@ router.post('/upload-picture', upload.single('image'), async (req, res) => {
   }
 });
 
-router.get('/pictures/:school_id', async (req, res) => {
-  const { school_id } = req.params;
+// Get all pictures for a given school code
+router.get('/pictures/:code', async (req, res) => {
+  const { code } = req.params;
   try {
-    const [rows] = await pool.query('SELECT * FROM pictures WHERE school_id = ?', [school_id]);
+    const [rows] = await pool.query(
+      'SELECT * FROM pictures WHERE code = ?',
+      [code]
+    );
     res.json({ success: true, pictures: rows });
   } catch (err) {
+    console.error('Fetch pictures error:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });

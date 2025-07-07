@@ -1,6 +1,6 @@
 const db = require('../db');
 
-async function getTableStatus(table, schoolId) {
+async function getTableStatus(table, code) {
   // Fetch required and visible fields from form_fields
   const [requiredRows] = await db.query(
     `SELECT field_name FROM form_fields WHERE table_name = ? AND required = TRUE`,
@@ -26,8 +26,8 @@ async function getTableStatus(table, schoolId) {
 
   // Fetch current data for those fields
   const [dataRows] = await db.query(
-    `SELECT ?? FROM ?? WHERE school_id = ? LIMIT 1`,
-    [visibleFields, table, schoolId]
+    `SELECT ?? FROM ?? WHERE code = ? LIMIT 1`,
+    [visibleFields, table, code]
   );
   if (dataRows.length === 0) {
     return 'Not started';
@@ -46,19 +46,11 @@ async function getTableStatus(table, schoolId) {
   });
 
   // Determine status
-  // If no required fields filled but some visible fields filled, mark in progress
-  if (filledRequired.length === 0 && filledVisible.length > 0) {
-    return 'In progress';
-  }
-  // If no required fields and no visible fields filled, not started
   if (filledRequired.length === 0) {
-    return 'Not started';
+    return filledVisible.length > 0 ? 'In progress' : 'Not started';
   }
-  if (filledRequired.length === requiredFields.length && filledVisible.length < visibleFields.length) {
-    return 'Required fields complete';
-  }
-  if (filledVisible.length === visibleFields.length) {
-    return 'Input complete';
+  if (filledRequired.length === requiredFields.length) {
+    return 'Complete';
   }
   return 'In progress';
 }

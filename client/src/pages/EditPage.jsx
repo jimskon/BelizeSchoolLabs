@@ -14,8 +14,8 @@ export default function EditPage() {
     async function fetchData() {
       try {
         const school = JSON.parse(localStorage.getItem('school'));
-        if (!school?.id) throw new Error('No school session');
-        const res = await fetch(`${API_BASE_URL}/api/${table}?school_id=${school.id}`);
+        if (!school?.code) throw new Error('No school session');
+        const res = await fetch(`${API_BASE_URL}/api/${table}?code=${school.code}`);
         const raw = await res.json();
         if (!res.ok) {
           alert(raw.error || 'Failed to load data');
@@ -42,7 +42,7 @@ export default function EditPage() {
   const handleSubmit = async (updatedData) => {
     try {
       const school = JSON.parse(localStorage.getItem('school'));
-      const payload = { ...updatedData, school_id: school.id };
+      const payload = { ...updatedData, code: school.code };
       const res = await fetch(`${API_BASE_URL}/api/${table}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,7 +53,7 @@ export default function EditPage() {
         // Clear draft on successful save
         localStorage.removeItem(`draft_${table}`);
         alert('Saved successfully!');
-        navigate('/main');
+        // Remain on edit page and show saved data
       } else {
         alert(result.error || 'Save failed');
       }
@@ -67,7 +67,7 @@ export default function EditPage() {
     try {
       // Persist partial data to server
       const school = JSON.parse(localStorage.getItem('school'));
-      const payload = { ...cancelData, school_id: school.id };
+      const payload = { ...cancelData, code: school.code };
       await fetch(`${API_BASE_URL}/api/${table}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

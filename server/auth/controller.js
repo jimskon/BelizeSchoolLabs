@@ -1,7 +1,7 @@
 const db = require('../db');
 const { sendEmail } = require('../utils/email');
 const bcrypt = require('bcrypt');
-const { generateReadablePassword } = require('../utils/password');
+//const { generateReadablePassword } = require('../utils/password');
 
 // Generate and send a one-time login PIN (valid 10 minutes)
 exports.sendLoginPin = async (req, res) => {
@@ -32,23 +32,23 @@ exports.sendLoginPin = async (req, res) => {
     const pin = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     let [[schoolRow]] = await db.query(
-      'SELECT id FROM school WHERE name = ?',
-      [school_name]
+      'SELECT code FROM school WHERE code = ?',
+      [codeTo]
     );
-    if (!schoolRow || !schoolRow.id) {
+    if (!schoolRow || !schoolRow.code) {
       await db.query(
         'INSERT INTO school (name, code) VALUES (?, ?)',
         [school_name, codeTo]
       );
       [[schoolRow]] = await db.query(
-        'SELECT id FROM school WHERE name = ?',
-        [school_name]
+        'SELECT code FROM school WHERE code = ?',
+        [codeTo]
       );
     }
-    const school = schoolRow;
+    const schoolCode = schoolRow.code;
     await db.query(
-      'UPDATE school SET login_pin = ?, pin_expires_at = ? WHERE id = ?',
-      [pin, expiresAt, school.id]
+      'UPDATE school SET login_pin = ?, pin_expires_at = ? WHERE code = ?',
+      [pin, expiresAt, schoolCode]
     );
     await sendEmail({
       to: emailTo,
@@ -67,7 +67,7 @@ exports.login = async (req, res) => {
   const { name, pin } = req.body;
   try {
     const [rows] = await db.query(
-      'SELECT id, login_pin, pin_expires_at FROM school WHERE name = ?',
+      'SELECT code, login_pin, pin_expires_at FROM school WHERE name = ?',
       [name]
     );
     const school = rows[0];
@@ -80,13 +80,13 @@ exports.login = async (req, res) => {
     if (!school.pin_expires_at || new Date(school.pin_expires_at) < new Date()) {
       return res.json({ success: false, error: 'PIN expired' });
     }
-    await db.query('UPDATE school SET login_pin = NULL, pin_expires_at = NULL WHERE id = ?', [school.id]);
+    await db.query('UPDATE school SET login_pin = NULL, pin_expires_at = NULL WHERE code = ?', [school.code]);
     const [infoRows] = await db.query(
-      'SELECT id FROM school_info WHERE school_id = ?',
-      [school.id]
+      'SELECT code FROM school_info WHERE code = ?',
+      [school.code]
     );
     const needsValidation = infoRows.length === 0;
-    res.json({ success: true, schoolId: school.id, needsValidation });
+    res.json({ success: true, code: school.code, needsValidation });
   } catch (err) {
     console.error('login error:', err);
     res.status(500).json({ success: false, error: 'Server error' });
@@ -94,6 +94,20 @@ exports.login = async (req, res) => {
 };
 
 // Request account manually
+exports.requestAccount = async (req, res) => {
+  const { school_name, district, school_email, school_phone, school_address } = req.body;
+  try {
+    await db.query(
+      `INSERT INTO account_requests (school_name, district, school_email, school_phone, school_address, status)
+       VALUES (?, ?, ?, ?, ?, 'pending')`,
+      [school_name, district, school_email, school_phone, school_address]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error('requestAccount error:', err);
+    res.status(500).json({ success: false, error: 'Failed to request account' });
+  }
+};
 
 // Submit contact correction request
 exports.submitCorrection = async (req, res) => {
@@ -111,30 +125,15 @@ exports.submitCorrection = async (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to submit correction' });
   }
 };
-exports.requestAccount = async (req, res) => {
-  const { schoolName, district, email, phone, address, manager, managerEmail, managerPhone } = req.body;
-  try {
-    await db.query(
-      `INSERT INTO account_requests
-       (school_name, district, school_email, school_phone, school_address, manager_name, manager_email, manager_phone, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-      [schoolName, district, email, phone, address, manager, managerEmail, managerPhone]
-    );
-    res.json({ success: true });
-  } catch (err) {
-    console.error('requestAccount error:', err);
-    res.status(500).json({ success: false, error: 'Database error' });
-  }
-};
 
 // Send password to MOE email (deprecated)
-exports.sendPasswordEmail = async (req, res) => {
+/*exports.sendPasswordEmail = async (req, res) => {
   const { school_name } = req.body;
   try {
     let emailToSend = null;
     let schoolCode = null;
     const [[moeRow]] = await db.query(
-      'SELECT email, code FROM moe_school_info WHERE name = ?',
+      'SELECT email, code FROM school_info WHERE name = ?',
       [school_name]
     );
     if (moeRow) {
@@ -156,9 +155,9 @@ exports.sendPasswordEmail = async (req, res) => {
     }
     const generatedPassword = generateReadablePassword();
     const hashedPassword = await bcrypt.hash(generatedPassword, 10);
-    const [[existing]] = await db.query('SELECT id FROM school WHERE name = ?', [school_name]);
-    if (existing && existing.id) {
-      await db.query('UPDATE school SET code = ?, password = ? WHERE id = ?', [schoolCode, hashedPassword, existing.id]);
+    const [[existing]] = await db.query('SELECT code FROM school WHERE name = ?', [school_name]);
+    if (existing && existing.code) {
+      await db.query('UPDATE school SET code = ?, password = ? WHERE code = ?', [schoolCode, hashedPassword, existing.code]);
     } else {
       await db.query('INSERT INTO school (name, code, password) VALUES (?, ?, ?)', [school_name, schoolCode, hashedPassword]);
     }
@@ -168,10 +167,10 @@ exports.sendPasswordEmail = async (req, res) => {
     console.error('sendPasswordEmail error:', err);
     res.status(500).json({ success: false, error: 'Failed to send code' });
   }
-};
+};*/
 
 // Other admin handlers
-exports.getPendingRequests = async (req, res) => {
+/*exports.getPendingRequests = async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM account_requests WHERE status = "pending"');
     res.json({ success: true, requests: rows });
@@ -204,10 +203,10 @@ exports.resetPassword = async (req, res) => {
   if (!school_id || !newPassword) return res.status(400).json({ success: false, error: 'Missing school_id or password' });
   try {
     const hashed = await bcrypt.hash(newPassword, 10);
-    await db.query('UPDATE school SET password = ?, is_temp_password = FALSE WHERE id = ?', [hashed, school_id]);
+    await db.query('UPDATE school SET password = ?, is_temp_password = FALSE WHERE code = ?', [hashed, school_id]);
     res.json({ success: true });
   } catch (err) {
     console.error('resetPassword error:', err);
     res.status(500).json({ success: false, error: 'Reset failed' });
   }
-};
+};*/

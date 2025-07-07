@@ -53,7 +53,7 @@ export default function LoginPage() {
     });
     const data = await res.json();
     if (res.ok && data.success) {
-      const schoolSession = { id: data.schoolId, name: selectedSchool };
+      const schoolSession = { name: selectedSchool, code: data.code };
       localStorage.setItem('school', JSON.stringify(schoolSession));
       if (data.needsValidation) {
         navigate(`/validate?name=${encodeURIComponent(selectedSchool)}`);

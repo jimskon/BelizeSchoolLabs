@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 
+
 require('dotenv').config();
 
 const app = express();
@@ -49,19 +50,26 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Picture upload endpoint
 app.post('/api/pictures/upload', upload.single('file'), async (req, res) => {
   try {
-    const { category, description } = req.body;
+    const { code, category, description } = req.body;
     const fileUrl = `/uploads/${req.file.filename}`;
     const fileType = req.file.mimetype;
+
     const [result] = await require('./db').query(
-      'INSERT INTO pictures (category, description, file_url, file_type) VALUES (?, ?, ?, ?)',
-      [category, description, fileUrl, fileType]
+      'INSERT INTO pictures (code, category, description, file_url, file_type) VALUES (?, ?, ?, ?, ?)',
+      [code, category, description, fileUrl, fileType]
     );
-    res.json({ success: true, picture: { id: result.insertId, category, description, file_url: fileUrl, file_type: fileType } });
+
+    res.json({
+      success: true,
+      picture: { id: result.insertId, code, category, description, file_url: fileUrl, file_type: fileType }
+    });
   } catch (err) {
     console.error('Error uploading picture:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
+
 app.use(express.static(path.join(__dirname, '../client/dist')));
 // Fallback to React app for unknown routes
 const indexPath = path.join(__dirname, '../client/dist/index.html');

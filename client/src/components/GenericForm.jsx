@@ -31,7 +31,15 @@ export default function GenericForm({ tableName, initialData = {}, onSubmit, onC
     }, [tableName]);
 
     const handleChange = (key, value) => {
-        setFormData(prev => ({ ...prev, [key]: value }));
+        setFormData(prev => {
+            const newData = { ...prev, [key]: value };
+            try {
+                localStorage.setItem(`draft_${tableName}`, JSON.stringify(newData));
+            } catch (e) {
+                console.warn('Failed to save draft to localStorage', e);
+            }
+            return newData;
+        });
     };
 
     const handleValidation = () => {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Button, Carousel } from 'react-bootstrap';
+import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -22,18 +23,18 @@ export default function HomePage() {
 
   useEffect(() => {
     const schoolData = JSON.parse(localStorage.getItem('school'));
-    if (schoolData && schoolData.id) {
+    if (schoolData && schoolData.code) {
       setSchoolName(schoolData.name);
-      fetchTableStatus(schoolData.id);
+      fetchTableStatus(schoolData.code);
       fetchPictures();
     } else {
       navigate('/login');
     }
   }, [navigate]);
 
-  const fetchTableStatus = async (id) => {
+  const fetchTableStatus = async (code) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/school/status/${id}`);
+      const res = await fetch(`${API_BASE_URL}/api/school/status/${code}`);
       const data = await res.json();
       if (data.success) setTables(data.tables);
     } catch (err) {
@@ -42,14 +43,20 @@ export default function HomePage() {
   };
 
   const fetchPictures = async () => {
+    const school = JSON.parse(localStorage.getItem('school'));
+    if (!school || !school.code) return;
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/pictures/list`);
+      const res = await fetch(`${API_BASE_URL}/api/pictures/list?code=${school.code}`);
       const data = await res.json();
-      if (data.success) setPictures(data.pictures);
+      if (data.success) {
+        setPictures(data.pictures);
+      }
     } catch (err) {
       console.error('Failed to load pictures', err);
     }
   };
+
 
   const handleUploadClick = () => {
     setShowUpload(true);
@@ -65,11 +72,20 @@ export default function HomePage() {
       alert('Please select a file to upload.');
       return;
     }
+
+    const schoolData = JSON.parse(localStorage.getItem('school'));
+    if (!schoolData || !schoolData.code) {
+      alert('School code not found. Please log in again.');
+      return;
+    }
+
     try {
       const formData = new FormData();
+      formData.append('code', schoolData.code); // ✅ attach the code!
       formData.append('category', uploadCategory);
       formData.append('description', uploadDescription);
       formData.append('file', uploadFile);
+
       const res = await fetch(`${API_BASE_URL}/api/pictures/upload`, {
         method: 'POST',
         body: formData,
@@ -226,9 +242,9 @@ export default function HomePage() {
                   <p className="card-text mb-2">
                     <span className={`badge me-2 ` +
                       (status === 'Input complete' ? 'bg-success' :
-                      status === 'Required fields complete' ? 'bg-warning text-dark' :
-                      status === 'In progress' ? 'bg-info text-dark' :
-                      status === 'Not started' ? 'bg-secondary' : 'bg-secondary')}>{status}</span>
+                        status === 'Required fields complete' ? 'bg-warning text-dark' :
+                          status === 'In progress' ? 'bg-info text-dark' :
+                            status === 'Not started' ? 'bg-secondary' : 'bg-secondary')}>{status}</span>
                     <small className="text-muted">{lastUpdated ? new Date(lastUpdated).toLocaleDateString() : '—'}</small>
                   </p>
                   <button className="btn btn-outline-primary mt-auto" onClick={() => navigate(`/${table}/edit`)}>

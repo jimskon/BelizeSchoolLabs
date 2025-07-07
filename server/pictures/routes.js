@@ -5,10 +5,18 @@ const db = require('../db');
 
 const router = express.Router();
 
-// List all pictures
+// ✅ List all pictures for a given school code
 router.get('/list', async (req, res) => {
+  const { code } = req.query;
+  if (!code) {
+    return res.status(400).json({ success: false, error: 'Missing school code' });
+  }
+
   try {
-    const [rows] = await db.query('SELECT * FROM pictures');
+    const [rows] = await db.query(
+      'SELECT * FROM pictures WHERE code = ? ORDER BY created_at DESC',
+      [code]
+    );
     res.json({ success: true, pictures: rows });
   } catch (err) {
     console.error('Error fetching pictures:', err);
@@ -16,7 +24,7 @@ router.get('/list', async (req, res) => {
   }
 });
 
-// Update picture metadata (category, description)
+// ✅ Update picture metadata (by code + category combo)
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { category, description } = req.body;
@@ -32,12 +40,13 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete picture and its file
+
+// ✅ Delete picture and its file (by code)
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const [[pic]] = await db.query('SELECT file_url FROM pictures WHERE id = ?', [id]);
-    if (pic) {
+    if (pic && pic.file_url) {
       const filePath = path.join(__dirname, '..', pic.file_url);
       fs.unlink(filePath, err => {
         if (err) console.warn('Failed to delete file:', err);
@@ -51,12 +60,13 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Get pictures by category
-router.get('/category/:category', async (req, res) => {
+
+// ✅ Get pictures by category across all schools
+/*router.get('/category/:category', async (req, res) => {
   const { category } = req.params;
   try {
     const [rows] = await db.query(
-      'SELECT * FROM pictures WHERE category = ? ORDER BY uploaded_at DESC',
+      'SELECT * FROM pictures WHERE category = ? ORDER BY created_at DESC',
       [category]
     );
     res.json({ success: true, pictures: rows });
@@ -64,7 +74,7 @@ router.get('/category/:category', async (req, res) => {
     console.error('Error fetching pictures by category:', err);
     res.status(500).json({ success: false, error: err.message });
   }
-});
+});*/
 
 
 module.exports = router;

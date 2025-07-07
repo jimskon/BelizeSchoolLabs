@@ -9,7 +9,7 @@ const ALLOWED_TABLES = [
   'curriculum',
   'computerRoom',
   'resources',
-  'pictures'
+  'pictures',
 ];
 
 // Validate table parameter
@@ -33,17 +33,17 @@ router.get('/:table/list', async (req, res) => {
   }
 });
 
-// GET: fetch or build empty record
+// GET: fetch or build empty record by code
 router.get('/:table', async (req, res) => {
   const { table } = req.params;
-  const schoolId = req.query.school_id;
-  if (!schoolId || isNaN(Number(schoolId))) {
-    return res.status(400).json({ error: 'Invalid or missing school_id' });
+  const code = req.query.code;
+  if (!code) {
+    return res.status(400).json({ error: 'Invalid or missing code' });
   }
   try {
     const [rows] = await db.query(
-      `SELECT * FROM ?? WHERE school_id = ? LIMIT 1`,
-      [table, schoolId]
+      `SELECT * FROM ?? WHERE code = ? LIMIT 1`,
+      [table, code]
     );
     if (rows.length > 0) {
       const result = rows[0];
@@ -55,11 +55,15 @@ router.get('/:table', async (req, res) => {
     const emptyRow = {};
     cols.forEach(col => {
       const f = col.Field;
-      if (['id'].includes(f)) return;
-      if (f === 'school_id') emptyRow[f] = Number(schoolId);
-      else emptyRow[f] = null;
+      if (f === 'code') {
+        emptyRow[f] = code;
+      } else if (['code', 'created_at', 'updated_at', 'verified_at', 'admin_comments'].includes(f)) {
+        // skip auto or admin fields
+      } else {
+        emptyRow[f] = null;
+      }
     });
-    // Insert an empty record to mark progress as soon as accessed
+    // Insert an empty record to mark progress
     const insertFields = Object.keys(emptyRow);
     const placeholders = insertFields.map(() => '?').join(', ');
     await db.query(
@@ -73,43 +77,49 @@ router.get('/:table', async (req, res) => {
   }
 });
 
-// POST: insert or update record
+// POST: insert or update record by code
 router.post('/:table', async (req, res) => {
   const { table } = req.params;
   const data = req.body;
+  // Remove id and school_id to prevent updating unintended columns
+  delete data.id;
+  delete data.school_id;
 
-  // Normalize boolean and numeric string values
+  // Normalize boolean values
   Object.keys(data).forEach(key => {
     if (data[key] === 'Yes') data[key] = 1;
     else if (data[key] === 'No') data[key] = 0;
-    else if (typeof data[key] === 'string' && /^[0-9]+$/.test(data[key])) data[key] = Number(data[key]);
   });
-  const schoolId = data.school_id;
-  if (!schoolId || isNaN(Number(schoolId))) {
-    return res.status(400).json({ success: false, error: 'Invalid or missing school_id' });
+
+  const code = data.code;
+  if (!code) {
+    return res.status(400).json({ success: false, error: 'Invalid or missing code' });
   }
+
   // Exclude read-only and admin_comments
-  const fields = Object.keys(data).filter(
-    key => !['id','school_id','created_at','updated_at','verified_at','admin_comments'].includes(key)
-  );
+  const excluded = ['school_id','id','code', 'created_at', 'updated_at', 'verified_at', 'admin_comments'];
+  const [colsResult] = await db.query(`SHOW COLUMNS FROM ??`, [table]);
+  const validColumns = colsResult.map(col => col.Field);
+  const fields = Object.keys(data).filter(key => validColumns.includes(key) && !excluded.includes(key));
   const values = fields.map(k => data[k]);
+
   try {
     const [[existing]] = await db.query(
-      `SELECT id FROM ?? WHERE school_id = ? LIMIT 1`,
-      [table, schoolId]
+      `SELECT code FROM ?? WHERE code = ? LIMIT 1`,
+      [table, code]
     );
-    if (existing && existing.id) {
-      const setClause = fields.map(f => `\`${f}\` = ?`).join(', ');
+    const setClause = fields.map(f => `\`${f}\` = ?`).join(', ');
+    if (existing && existing.code) {
       await db.query(
-        `UPDATE ?? SET ${setClause} WHERE school_id = ?`,
-        [table, ...values, schoolId]
+        `UPDATE ?? SET ${setClause} WHERE code = ?`,
+        [table, ...values, code]
       );
     } else {
-      const cols = ['school_id', ...fields].map(f => `\`${f}\``).join(', ');
+      const cols = ['code', ...fields].map(f => `\`${f}\``).join(', ');
       const placeholders = Array(fields.length + 1).fill('?').join(', ');
       await db.query(
         `INSERT INTO ?? (${cols}) VALUES (${placeholders})`,
-        [table, schoolId, ...values]
+        [table, code, ...values]
       );
     }
     res.json({ success: true });

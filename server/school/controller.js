@@ -4,7 +4,7 @@ const pool = require('../db');
 
 
 exports.getMoeSchools = async (req, res) => {
-  const [rows] = await pool.query('SELECT name, district, type FROM moe_school_info ORDER BY name');
+  const [rows] = await pool.query('SELECT name, district, type FROM school_info ORDER BY name');
   console.log("SCHOOLS:",rows);
   res.json(rows);
 };
