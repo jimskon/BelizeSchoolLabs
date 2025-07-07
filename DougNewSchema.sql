@@ -160,7 +160,7 @@ CREATE TABLE moe_school_info (
 	district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
 	locality ENUM ('Rural','Urban'),
 	type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
-	ownership VARCHAR(50), -- (Advantist Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools,
+	ownership VARCHAR(50), -- (Adventits Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools,
 	-- Government Schools, Mennonite Schools - Church Group. Mennonite Schools - H&B, Mennonite Schools - Spanish Lookout,
 	-- Methodist Schools, Nazarene Schools, Presbyterian Schools, Private Schools, U.E.C.B Schools, Other)
 	sector ENUM ('Government', 'Government Aided', 'Private','Specially Assisted'),
@@ -175,9 +175,11 @@ CREATE TABLE moe_school_info (
 -- Table to store individual school
 
 CREATE TABLE school (
-	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school 
+	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school (username in WordPress)
 	name VARCHAR(80), -- Name for this school
 	password VARCHAR(255), -- Generated password/pin sent to specified email
+	school_id INT,  -- An outside integer for use by WordPress to identify the particular school
+
 	answered_filled_out BOOLEAN,  -- Yes, Have you filled out all the answers; or No, I did not know all the answers I will have someone else help me
 	
 	comments TEXT,  -- Do you have any comments about the above information
@@ -190,7 +192,7 @@ CREATE TABLE school (
 
 CREATE TABLE school_info (
 	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
-	name VARCHAR(80), -- This is the name of the school from the MOE and corrected
+	name VARCHAR(80), -- This is the name of the school from the MOE and corrected (Same as in the "school" table)
 
 	address VARCHAR(80), -- School's main address
 	contact_person VARCHAR(50), -- School's contact person (from the MOE)
@@ -205,7 +207,7 @@ CREATE TABLE school_info (
 	district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
 	locality ENUM ('Rural','Urban'),
 	type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
-	ownership VARCHAR(50), -- (Advantist Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools, 
+	ownership VARCHAR(50), -- (Adventits Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools, 
 	-- Government Schools, Mennonite Schools - Church Group. Mennonite Schools - H&B, Mennonite Schools - Spanish Lookout,
 	-- Methodist Schools, Nazarene Schools, Presbyterian Schools, Private Schools, U.E.C.B Schools, Other)
 	sector ENUM ('Government', 'Government Aided', 'Private','Specially Assisted'),
@@ -246,27 +248,30 @@ CREATE TABLE demographics (
 	number_of_buildings INT, -- Number of buildings at your school (not including storage buildings)
 	number_of_classrooms INT, -- Number of classrooms in your school
 	number_of_computer_labs INT,-- Number of computer labs / rooms in your school (0,1,2,3+)
+
 	minutes_drive_from_road INT, -- How many minutes drive is your school from the main road?
 	power_stability INT, -- Number of times per week the school’s power goes out (0, 1, 2, 3, 4, 5+)
 	has_pta BOOLEAN, -- Does your school have a PTA or group to help with funding?
 
-   -- Internet Section
+   -- Internet and Computer Section
 
+	has_computers BOOLEAN, -- Does your school have computers, tablets, or laptops for the students to learn on
 	has_internet BOOLEAN, -- Does your school have Internet access (yes, no)
+	has_technician BOOLEAN, -- Does your school have a technician that can repair computers
 
 	-- Ask the following if they have internet (if not then force fill the fields with NULL, 0, etc)
 
-	number_of_classrooms_with_internet INT, -- Number of classrooms with Internet or WiFi
+	internet_classrooms INT, -- Number of classrooms with Internet or WiFi
 	internet_provider VARCHAR(50), -- Internet provider (e.g. 'DigiNet', 'NextGen', 'Other')
 	internet_speed ENUM ('Don’t know', '10 to 49 Mbps', '50 to 99 Mbps', '100 to 249 Mbps', '250 to 500 Mbps'),  --  Internet speed in Mbps 
-	connection_method VARCHAR(50), -- Internet connection method (‘Fiber’, ‘Cable’, ‘Wireless ISP’, ‘Hot Spot’, ‘Other’),
+	internet_method VARCHAR(50), -- Internet connection method (‘Fiber’, ‘Cable’, ‘Wireless ISP’, ‘Hot Spot’, ‘Other’),
 	internet_stability ENUM ('Very stable', 'Mostly OK','Comes in and out','Unstable'), -- Describe the Internet stability when all students are using the computer lab, laptops, and Chromebooks  –  
 
 	-- General computer section
 
-	number_of_teachers_that_have_laptops INT, -- How many of your teachers own laptops?
-	number_of_full_time_IT_teachers INT, -- Number of full-time IT teachers
-	number_of_teachers_that_also_teach_IT INT, -- Number of teachers who also teach IT
+	teachers_with_laptops INT, -- How many of your teachers own laptops?
+	full_time_IT_teachers INT, -- Number of full-time IT teachers
+	teachers_that_also_teach_IT INT, -- Number of teachers who also teach IT
 
 	-- If they have an IT teacher of either IT type is > 0 then ask the following. If the have an IT teacher then word this question as:  “... IT teacher …” else word it as “... main teacher that teaches IT..”.
 
@@ -276,9 +281,9 @@ CREATE TABLE demographics (
 
 	-- For the percentages below make a dropdown to fill in the INT (less than 20%, 20% - 40%, 40% - 60%, 60% - 80%, 80%+)
 
-	percentage_of_students_who_have_personal_computers INT, -- Estimate of the percentage of your students who own computers
-	students_computers_outside_school INT, -- Estimate of the percentage of your  students who have access to computers outside of school
-	students__phones_for_school_work  INT, -- Estimate of the percentage of your students who use phones for their school work
+	students_own_computers INT, -- Estimate of the percentage of your students who own computers
+	students_access_computers INT, -- Estimate of the percentage of your  students who have access to computers outside of school
+	students_phones  INT, -- Estimate of the percentage of your students who use phones for their school work
 
 	comments TEXT,  -- Do you have any comments about the above information
 	admin_comments TEXT, -- (Only seen by the administrator)
@@ -420,10 +425,11 @@ CREATE TABLE resources (
 
 	-- Ask the following if resources.number_of_computer_labs > 0
 
+	principals_computer BOOLEAN, -- Does the principal have a non-rented good working computer? 
 	number_seats INT, -- How many student computer stations can your lab accommodate?
-
 	desktop_working INT, --  How many working desktop computers does your main school lab / room have?   
-	desktop_not_working INT, --  How many non-working desktops do you have?  Some people have reported a non-working desktop when the problem 
+	desktop_not_working INT, --  How many non-working desktops do you have?  Some people have reported a non-working desktop when the problem is the keyboard or mouse.
+
 	-- has been that the monitor, keyboard or mouse is what is actually broken. Please report here the actual desktop.
 
 	desktop_age INT, -- Estimate how old your desktops are in years?
@@ -458,7 +464,8 @@ CREATE TABLE resources (
 -- Table to store pictures uploaded by schools
 
 CREATE TABLE pictures (
-	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	code VARCHAR(10), -- MOE's code for each school
 
 	category VARCHAR(50), -- such as 'school_building', 'lab', 'resources', 'students', 'events', 'district_map', 'management_map', 'other'
 	description TEXT,
@@ -475,7 +482,8 @@ CREATE TABLE pictures (
 -- Table to store current grant status - filled in by administrator
 
 CREATE TABLE school_grant_status (
-	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	code VARCHAR(10), -- MOE's code for each school
 	
 	status ENUM ('more info needed', 'pending_phone_call', 'pending site visit', 'pending final approval', 'approved for advertising', 'granted', 'pending shipment', 'pending installation', 'installed'),
 	number_of_computers INT,
@@ -507,7 +515,8 @@ CREATE TABLE form_fields (
 -- Table to hold the correction requests -- Admin can go in and then correct
 
 CREATE TABLE contact_corrections (
-	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	code VARCHAR(10), -- MOE's code for each school
 	school_name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
 	district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
 	type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
@@ -572,6 +581,7 @@ CREATE TABLE management (
 -- Table to store staff details (teachers, managers, district representative)
 
 CREATE TABLE school_staff (
+	id INT PRIMARY KEY AUTO_INCREMENT,
 	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
 
 	person VARCHAR(50), -- name of staff person
@@ -595,6 +605,7 @@ CREATE TABLE school_staff (
 -- Table for managing staff laptops
 
 CREATE TABLE school_staff_laptop (
+	id INT PRIMARY KEY AUTO_INCREMENT,
 	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school
 
 	brand VARCHAR(50),
