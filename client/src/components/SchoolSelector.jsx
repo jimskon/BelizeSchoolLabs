@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-export default function SchoolSelector({ selectedSchool, setSelectedSchool, selectedDistrict, setSelectedDistrict }) {
+export default function SchoolSelector({ selectedSchool, setSelectedSchool, selectedDistrict, setSelectedDistrict, selectedType, setSelectedType }) {
   const [schools, setSchools] = useState([]);
   const [districts, setDistricts] = useState([]);
+  const [types, setTypes] = useState([]);
 
   useEffect(() => {
     const fetchSchools = async () => {
@@ -16,6 +17,10 @@ export default function SchoolSelector({ selectedSchool, setSelectedSchool, sele
         // Extract districts from data
         const uniqueDistricts = [...new Set(data.map(s => s.district).filter(Boolean))].sort();
         setDistricts(uniqueDistricts);
+
+        // Extract types from data
+        const uniqueTypes = [...new Set(data.map(s => s.type).filter(Boolean))].sort();
+        setTypes(uniqueTypes);
       } catch (err) {
         console.error("Error fetching school list:", err);
       }
@@ -24,9 +29,11 @@ export default function SchoolSelector({ selectedSchool, setSelectedSchool, sele
     fetchSchools();
   }, []);
 
-  const filteredSchools = selectedDistrict
-    ? schools.filter(s => s.district === selectedDistrict)
-    : schools;
+  const filteredSchools = schools.filter(
+    s =>
+      (!selectedDistrict || s.district === selectedDistrict) &&
+      (!selectedType || s.type === selectedType)
+  );
 
   return (
     <div className="mb-3">
@@ -35,12 +42,31 @@ export default function SchoolSelector({ selectedSchool, setSelectedSchool, sele
         <select
           className="form-select"
           value={selectedDistrict}
-          onChange={(e) => setSelectedDistrict(e.target.value)}
+          onChange={e => setSelectedDistrict(e.target.value)}
           style={{ width: '20ch' }}
         >
           <option value="">-- All Districts --</option>
           {districts.map((d, i) => (
-            <option key={i} value={d}>{d}</option>
+            <option key={i} value={d}>
+              {d}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-2">
+        <label className="form-label fw-semibold">Type</label>
+        <select
+          className="form-select"
+          value={selectedType}
+          onChange={e => setSelectedType(e.target.value)}
+          style={{ width: '20ch' }}
+        >
+          <option value="">-- All Types --</option>
+          {types.map((t, i) => (
+            <option key={i} value={t}>
+              {t}
+            </option>
           ))}
         </select>
       </div>
@@ -50,12 +76,15 @@ export default function SchoolSelector({ selectedSchool, setSelectedSchool, sele
         <select
           className="form-select"
           value={selectedSchool}
-          onChange={(e) => setSelectedSchool(e.target.value)}
+          onChange={e => setSelectedSchool(e.target.value)}
+          disabled={!selectedDistrict || !selectedType}
           style={{ width: '60ch' }}
         >
           <option value="">-- Select a School --</option>
           {filteredSchools.map((s, i) => (
-            <option key={i} value={s.name}>{s.name}</option>
+            <option key={i} value={s.name}>
+              {s.name}
+            </option>
           ))}
         </select>
       </div>

@@ -8,7 +8,8 @@ const ALLOWED_TABLES = [
   'demographics',
   'curriculum',
   'computerRoom',
-  'resources'
+  'resources',
+  'pictures'
 ];
 
 // Validate table parameter
