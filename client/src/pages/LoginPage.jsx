@@ -159,7 +159,7 @@ export default function LoginPage() {
 
                   <div className="mt-4">
                     <p>
-                      Your School's PIN will be sent to this email:{' '}
+                      Send your School's PIN to this email address:{' '}
                       <strong>
                         {moeEmail ? maskEmail(moeEmail) : 'xx@xx.xx'}
                       </strong>
@@ -175,13 +175,13 @@ export default function LoginPage() {
 
                   <div className="mt-3">
                     <p>
-                      If this email is invalid, kindly request the PIN on another valid email
+                      If the above email is invalid, kindly request to correct this email address
                     </p>
                     <button
-                      className="btn btn-link p-0"
+                      className="btn btn-secondary"
                       onClick={() => setShowCorrectionForm(true)}
                     >
-                      Submit New Email
+                      Email Correction Request
                     </button>
                   </div>
 
@@ -221,7 +221,7 @@ export default function LoginPage() {
                         />
                       </div>
                       <button className="btn btn-primary" onClick={handleSubmitCorrection}>
-                        Submit New Email
+                        Submit Email Correction Request
                       </button>
                     </div>
                   )}

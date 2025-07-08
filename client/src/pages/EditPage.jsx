@@ -39,7 +39,7 @@ export default function EditPage() {
     fetchData();
   }, [table, navigate]);
 
-  const handleSubmit = async (updatedData) => {
+  const handleSubmit = async (updatedData) => {  // add this line
     try {
       const school = JSON.parse(localStorage.getItem('school'));
       const payload = { ...updatedData, code: school.code };
@@ -49,13 +49,16 @@ export default function EditPage() {
         body: JSON.stringify(payload)
       });
       const result = await res.json();
+      console.log('Save result:', result); 
+      
       if (result.success) {
-        // Clear draft on successful save
-        localStorage.removeItem(`draft_${table}`);
-        alert('Saved successfully!');
-        // Remain on edit page and show saved data
+          // Clear draft on successful save
+          localStorage.removeItem(`draft_${table}`);
+-         navigate('/main', { replace: true });
++         alert('Saved successfully!');
++        navigate('/main');
       } else {
-        alert(result.error || 'Save failed');
+      alert(result.error || 'Save failed');
       }
     } catch (err) {
       console.error('Save error:', err);

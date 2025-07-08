@@ -38,7 +38,7 @@ export default function SchoolSelector({ selectedSchool, setSelectedSchool, sele
   return (
     <div className="mb-3">
       <div className="mb-2">
-        <label className="form-label fw-semibold">District</label>
+        <label className="form-label fw-semibold">Select School District</label>
         <select
           className="form-select"
           value={selectedDistrict}
@@ -55,7 +55,7 @@ export default function SchoolSelector({ selectedSchool, setSelectedSchool, sele
       </div>
 
       <div className="mb-2">
-        <label className="form-label fw-semibold">Type</label>
+        <label className="form-label fw-semibold">Select School Type</label>
         <select
           className="form-select"
           value={selectedType}
@@ -72,13 +72,12 @@ export default function SchoolSelector({ selectedSchool, setSelectedSchool, sele
       </div>
 
       <div>
-        <label className="form-label fw-semibold">School</label>
+        <label className="form-label fw-semibold">Select School</label>
         <select
-          className="form-select"
+          className="form-select w-full max-w-xl"
           value={selectedSchool}
           onChange={e => setSelectedSchool(e.target.value)}
           disabled={!selectedDistrict || !selectedType}
-          style={{ width: '60ch' }}
         >
           <option value="">-- Select a School --</option>
           {filteredSchools.map((s, i) => (
@@ -88,6 +87,7 @@ export default function SchoolSelector({ selectedSchool, setSelectedSchool, sele
           ))}
         </select>
       </div>
+
     </div>
   );
 }
