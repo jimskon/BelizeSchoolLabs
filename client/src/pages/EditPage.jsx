@@ -58,11 +58,13 @@ export default function EditPage() {
 +         alert('Saved successfully!');
 +        navigate('/main');
       } else {
-      alert(result.error || 'Save failed');
+        // Display backend error details
+        alert(`Save failed: ${result.error || JSON.stringify(result)}`);
       }
     } catch (err) {
       console.error('Save error:', err);
-      alert('An error occurred while saving.');
+      // Show detailed error message
+      alert(`An error occurred while saving: ${err.message}`);
     }
   };
 

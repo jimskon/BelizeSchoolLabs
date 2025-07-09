@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import AutoResizingTextarea from './AutoResizingTextarea'; // Adjust path as needed
+
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -18,12 +20,32 @@ export default function GenericForm({
   // track which dropdowns are in "Other" mode
   const [showOthers, setShowOthers] = useState({});
 
-  // Sync formData when initialData changes
+  // Sync formData when initialData changes and initialize dropdown 'Other' modes
   useEffect(() => {
-    setFormData(initialData);
-    // reset other-fields flags
-    setShowOthers({});
-  }, [initialData]);
+  setFormData(initialData);
+  const initialShowOthers = {};
+  config.forEach(field => {
+  if (field.type === 'dropdown') {
+  const options = field.valuelist
+  ? field.valuelist.split(',').map(opt => opt.trim())
+  : [];
+  const staticOptions = options.filter(opt => opt !== 'Other');
+  const val = initialData[field.field_name];
+  // Skip "Yes/No" dropdowns for Other-mode logic
+  if (!(staticOptions.length === 2 && staticOptions[0] === 'Yes' && staticOptions[1] === 'No')) {
+  if (
+  val !== undefined &&
+  val !== null &&
+  val !== '' &&
+  staticOptions.indexOf(val) === -1
+  ) {
+  initialShowOthers[field.field_name] = true;
+  }
+  }
+  }
+  });
+  setShowOthers(initialShowOthers);
+  }, [initialData, config]);
 
   // Load form configuration and page metadata
   useEffect(() => {
@@ -45,6 +67,7 @@ export default function GenericForm({
     setFormData(prev => {
       const newData = { ...prev, [key]: value };
       try {
+        // Save draft under a consistent key
         localStorage.setItem(
           `draft_${tableName}`,
           JSON.stringify(newData)
@@ -87,7 +110,7 @@ export default function GenericForm({
     const options = valuelist
       ? valuelist.split(',').map(opt => opt.trim())
       : [];
-      const staticOptions = options.filter(opt => opt !== 'Other');
+    const staticOptions = options.filter(opt => opt !== 'Other');
     const rawValue = formData[field_name] ?? '';
 
     // Numeric field, e.g. "num(1,100)"
@@ -114,7 +137,35 @@ export default function GenericForm({
       );
     }
 
-    // Dropdown with optional "Other"
+    // Yes/No dropdown: map DB 1/0 to labels and back, no extra input
+    if (type === 'dropdown' && staticOptions.length === 2 && staticOptions[0] === 'Yes' && staticOptions[1] === 'No') {
+      const selectValue = rawValue === 1 || rawValue === '1' ? 'Yes'
+        : rawValue === 0 || rawValue === '0' ? 'No'
+        : '';
+      return (
+        <div className={`col-md-${field_width}`} key={field_name}>
+          <label className="form-label">{prompt}</label>
+          <select
+            className="form-select"
+            value={selectValue}
+            onChange={e => {
+              const val = e.target.value;
+              const storedVal = val === 'Yes' ? 1 : val === 'No' ? 0 : '';
+              handleChange(field_name, storedVal);
+            }}
+          >
+            <option value="">-- Select --</option>
+            {staticOptions.map(opt => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+
+    // Generic dropdown with optional "Other"
     if (type === 'dropdown') {
       const isOther = showOthers[field_name] === true;
       return (
@@ -126,18 +177,10 @@ export default function GenericForm({
             onChange={e => {
               const val = e.target.value;
               if (val === '__other__') {
-                // switch into "Other" mode
-                setShowOthers(prev => ({
-                  ...prev,
-                  [field_name]: true
-                }));
+                setShowOthers(prev => ({ ...prev, [field_name]: true }));
                 handleChange(field_name, '');
               } else {
-                // normal selection, clear Other mode
-                setShowOthers(prev => ({
-                  ...prev,
-                  [field_name]: false
-                }));
+                setShowOthers(prev => ({ ...prev, [field_name]: false }));
                 handleChange(field_name, val);
               }
             }}
@@ -148,32 +191,55 @@ export default function GenericForm({
                 {opt}
               </option>
             ))}
-            {options.includes('Other') && (
-              <option value="__other__">Other</option>
-            )}
+            {options.includes('Other') && <option value="__other__">Other</option>}
           </select>
-
           {isOther && (
             <input
               className="form-control mt-2"
               placeholder="Specify..."
-              value={formData[field_name] || ''}
-              onChange={e =>
-                handleChange(field_name, e.target.value)
-              }
+              value={formData[field.field_name] || ''}
+              onChange={e => handleChange(field_name, e.target.value)}
             />
           )}
         </div>
       );
     }
 
-    // Default text/email/phone
+    // Textarea
+    if (type === 'textarea') {
+  return (
+    <div className={`col-md-${field_width}`} key={field_name}>
+      <label className="form-label">{prompt}</label>
+      <AutoResizingTextarea
+        value={rawValue}
+        onChange={e => handleChange(field_name, e.target.value)}
+      />
+    </div>
+  );
+}
+
+
+    // Text input (auto-resizing for comment and others)
+    if (type === 'text') {
+      return (
+        <div className={`col-md-${field_width}`} key={field_name}>
+          <label className="form-label">{prompt}</label>
+          <AutoResizingTextarea
+            value={rawValue}
+            onChange={e => handleChange(field_name, e.target.value)}
+            rows={1}
+          />
+        </div>
+      );
+    }
+
+    // Email/phone inputs
     const inputType =
       type === 'email'
         ? 'email'
         : type === 'phone'
-        ? 'tel'
-        : 'text';
+          ? 'tel'
+          : 'text';
     return (
       <div className={`col-md-${field_width}`} key={field_name}>
         <label className="form-label">{prompt}</label>
