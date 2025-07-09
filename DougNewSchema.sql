@@ -216,6 +216,7 @@ CREATE TABLE school_info (
 	administrator_2 VARCHAR(50), -- Alternate administrator 2 name (from MOE)
 	email_1 VARCHAR(50), -- Alternate administrator 1 email address (not from MOE)
 	email_2 VARCHAR(50), -- Alternate administrator 2 email address (not from MOE)
+	discription TEXT, -- Discription of your school that a potential visitor or donor would like to know
 
 	comments TEXT,  -- Do you have any comments about the above information
 	admin_comments TEXT, -- (Only seen by the administrator)
@@ -261,17 +262,17 @@ CREATE TABLE demographics (
 
 	-- Ask the following if they have internet (if not then force fill the fields with NULL, 0, etc)
 
-	internet_classrooms INT, -- Number of classrooms with Internet or WiFi
+	internet_classrooms INT, -- Number of classrooms with Internet or WiFi (pick box 0 to 30)
 	internet_provider VARCHAR(50), -- Internet provider (e.g. 'DigiNet', 'NextGen', 'Other')
-	internet_speed ENUM ('Don’t know', '10 to 49 Mbps', '50 to 99 Mbps', '100 to 249 Mbps', '250 to 500 Mbps'),  --  Internet speed in Mbps 
+	internet_speed ENUM ('Don’t know', '10 to 49 Mbps', '50 to 99 Mbps', '100 to 149 Mbps', '150 to 200+ Mbps'),  --  Internet speed in Mbps 
 	internet_method VARCHAR(50), -- Internet connection method (‘Fiber’, ‘Cable’, ‘Wireless ISP’, ‘Hot Spot’, ‘Other’),
-	internet_stability ENUM ('Very stable', 'Mostly OK','Comes in and out','Unstable'), -- Describe the Internet stability when all students are using the computer lab, laptops, and Chromebooks  –  
+	internet_stability ENUM ('Very stable', 'Mostly OK','Unstable'), -- Describe the Internet stability when all students are using the computer lab, laptops, and Chromebooks  –  
 
 	-- General computer section
 
-	teachers_with_laptops INT, -- How many of your teachers own laptops?
-	full_time_IT_teachers INT, -- Number of full-time IT teachers
-	teachers_that_also_teach_IT INT, -- Number of teachers who also teach IT
+	teachers_with_laptops INT, -- How many of your teachers own laptops? (0 to 30)
+	full_time_IT_teachers INT, -- Number of full-time IT teachers (0 to 5)
+	teachers_that_also_teach_IT INT, -- Number of teachers who also teach IT (0 to 10)
 
 	-- If they have an IT teacher of either IT type is > 0 then ask the following. If the have an IT teacher then word this question as:  “... IT teacher …” else word it as “... main teacher that teaches IT..”.
 
@@ -468,7 +469,10 @@ CREATE TABLE pictures (
 	code VARCHAR(10), -- MOE's code for each school
 
 	category VARCHAR(50), -- such as 'school_building', 'lab', 'resources', 'students', 'events', 'district_map', 'management_map', 'other'
-	description TEXT,
+-- Change below to caption --
+	description TEXT,  -- Caption for this picture
+	presentation_order INT,  -- The order that this picture is presented within a catagory
+
 	file_url VARCHAR(50),
 	file_type VARCHAR(50),
 	approved_for_adver BOOLEAN, -- Set by the administrator
