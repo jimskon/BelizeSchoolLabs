@@ -264,7 +264,7 @@ CREATE TABLE demographics (
 
 	internet_classrooms INT, -- Number of classrooms with Internet or WiFi (pick box 0 to 30)
 	internet_provider VARCHAR(50), -- Internet provider (e.g. 'DigiNet', 'NextGen', 'Other')
-	internet_speed ENUM ('Don’t know', '10 to 49 Mbps', '50 to 99 Mbps', '100 to 149 Mbps', '150 to 200+ Mbps'),  --  Internet speed in Mbps 
+	internet_speed ENUM ('Do not know', '10 to 49 Mbps', '50 to 99 Mbps', '100 to 149 Mbps', '150 to 200+ Mbps'),  --  Internet speed in Mbps 
 	internet_method VARCHAR(50), -- Internet connection method (‘Fiber’, ‘Cable’, ‘Wireless ISP’, ‘Hot Spot’, ‘Other’),
 	internet_stability ENUM ('Very stable', 'Mostly OK','Unstable'), -- Describe the Internet stability when all students are using the computer lab, laptops, and Chromebooks  –  
 
