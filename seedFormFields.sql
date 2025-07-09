@@ -62,8 +62,8 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	-- Ask the following if they have internet (if not then force fill the fields with NULL, 0, etc)
 
 	('demographics',	'internet_classrooms',			'Number of classrooms with Internet or WiFi',					'num(0-10)',	NULL,		6,1,1),
-	('demographics',	'internet_provider',			'Internet Provider',											'dropdown',			NULL,		6,0,1),
-	('demographics',	'internet_speed',				'Internet Speed (Mbps)',									'dropdown', 	'Don’t know, 10 to 49 Mbps, 50 to 99 Mbps, 100 to 149 Mbps, 150 to 200+ Mbps',		6,0,1),
+	('demographics',	'internet_provider',			'Internet Provider',											'dropdown',	'DigiNet, NextGen, Other',		6,0,1),
+	('demographics',	'internet_speed',				'Internet Speed (Mbps)',									'dropdown', 	'Do not know, 10 to 49 Mbps, 50 to 99 Mbps, 100 to 149 Mbps, 150 to 200+ Mbps',		6,0,1),
 	('demographics',	'internet_method',				'Internet Connection Method',									'dropdown',	'Fiber, Cable, Wireless ISP, Hot Spot, Other',		6,0,1),
 	('demographics',	'internet_stability',			'Internet Stability',											'dropdown',	'Very stable', 'Mostly OK','Unstable',		6,0,1),
 
