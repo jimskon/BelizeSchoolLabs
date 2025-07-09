@@ -49,7 +49,7 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	('demographics',	'number_of_classrooms',			'Number of classrooms in your school',							'num(0-8)', 	NULL,		6,0,1),
 	('demographics',	'number_of_computer_labs',		'Number of computer labs / rooms in your school',				'dropdown',		'0,1,2,3+',	6,0,1),
 
-	('demographics',	'minutes_drive_from_road',		'How many minutes drive is your school from the main road?',	'num(0-120)', 	NULL,		6,1,1),
+	('demographics',	'minutes_drive_from_road',		'How many minutes drive is your school from the main road?',	'dropdown', 	'5, 10, 15, 20, 25, 30, 40',		6,1,1),
 	('demographics',	'power_stability',				'Power Outages Per Week',										'num(0-168)',	NULL,		6,1,1),
 	('demographics',	'has_pta',						'Has PTA/Support Group?',										'dropdown',		'Yes,No',	6,1,1),
 
@@ -63,9 +63,9 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 
 	('demographics',	'internet_classrooms',			'Number of classrooms with Internet or WiFi',					'num(0-10)',	NULL,		6,1,1),
 	('demographics',	'internet_provider',			'Internet Provider',											'dropdown',			NULL,		6,0,1),
-	('demographics',	'internet_speed',				'Internet Speed (Mbps)',									'dropdown', 	'Don’t know', '10 to 49 Mbps', '50 to 99 Mbps', '100 to 149 Mbps', '150 to 200+ Mbps',		6,0,1),
-	('demographics',	'internet_method',				'Internet Connection Method',									'dropdown',	‘Fiber’, ‘Cable’, ‘Wireless ISP’, ‘Hot Spot’, ‘Other’,		6,0,1),
-	('demographics',	'internet_stability',			'Internet Stability',											'dropdown',			NULL,		6,0,1),
+	('demographics',	'internet_speed',				'Internet Speed (Mbps)',									'dropdown', 	'Don’t know, 10 to 49 Mbps, 50 to 99 Mbps, 100 to 149 Mbps, 150 to 200+ Mbps',		6,0,1),
+	('demographics',	'internet_method',				'Internet Connection Method',									'dropdown',	'Fiber, Cable, Wireless ISP, Hot Spot, Other’,		6,0,1),
+	('demographics',	'internet_stability',			'Internet Stability',											'dropdown',	'Very stable', 'Mostly OK','Unstable',		6,0,1),
 
 	-- General computer section
 
