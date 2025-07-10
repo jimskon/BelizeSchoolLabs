@@ -15,8 +15,8 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	('school_info',		'email',						'School Main Contact Person email',				'email',		NULL,		6,1,1),
 
 	('school_info',		'website',						'School Website',								'text',			NULL,		6,0,1),
-	('school_info',		'year_opened',					'Year School Opened',							'num',			'1850,2025',6,0,1),
-	('school_info',		'longitude',					'Longitude',									'num',			NULL,		6,0,1),
+	('school_info',		'year_opened',					'Year School Opened',							'VARCHAR(50)',			'1850,2025',6,0,1),
+	('school_info',		'longitude',					'Longitude',									'VARCHAR(50)',			NULL,		6,0,1),
 	('school_info',		'latitude',						'Latitude',										'num',			NULL,		6,0,1),
 	('school_info',		'district',						'District',										'dropdown',		'Belize,Cayo,Corozal,Orange Walk,Stann Creek,Toledo',	6,1,1),
 	('school_info',		'locality',						'Locality',										'dropdown',		'Rural,Urban',	6,1,1),
