@@ -28,7 +28,7 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	('school_info',		'email_1',						'First Alternate Contact Person email',			'email',		NULL,		6,0,1),
 	('school_info',		'email_2',						'Second Alternate Contact Person email',		'email',		NULL,		6,0,1),
 	('school_info',		'comments',						'Comments about the above intormation',			'text',			NULL,		12,0,1),
-	('school_info',		'Description',					"Description of your school that a potential visitor or donor would like to know", 'text',			NULL,		12,0,1),
+	('school_info',		'Description',					"Description of your school that a potential visitor or donor would like to know", 'VARCHAR(500)',			NULL,		12,0,1),
 
 	-- demographics
 
