@@ -173,20 +173,20 @@ CREATE TABLE moe_school_info (
 );
 
 -- Table to store individual school
-
 CREATE TABLE school (
-	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school (username in WordPress)
-	name VARCHAR(80), -- Name for this school
-	password VARCHAR(255), -- Generated password/pin sent to specified email
-	school_id INT,  -- An outside integer for use by WordPress to identify the particular school
-
-	answered_filled_out BOOLEAN,  -- Yes, Have you filled out all the answers; or No, I did not know all the answers I will have someone else help me
-	
-	comments TEXT,  -- Do you have any comments about the above information
-	admin_comments TEXT, -- (Only seen by the administrator)
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  code VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL PRIMARY KEY,-- MOE's code for each school (username in WordPress)
+  name VARCHAR(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,  -- Name for this school
+  password VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL, -- Generated password/pin sent to specified email
+  answered_filled_out TINYINT(1) DEFAULT NULL, -- Yes, Have you filled out all the answers; or No, I did not know all the answers I will have someone else help me
+  comments TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL, -- Do you have any comments about the above information
+  admin_comments TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL, -- (Only seen by the administrator)
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  school_id INT(11) DEFAULT NULL,
+  login_pin VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  pin_expires_at DATETIME DEFAULT NULL
 );
+
 
 -- School information as originally proveded by the MOE and potentially updated by the school
 
