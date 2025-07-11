@@ -1,6 +1,6 @@
 // server/index.js - core API and React front-end only
 const express = require('express');
-const cors = require('cors');
+// const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 
@@ -8,7 +8,7 @@ const multer = require('multer');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+require('./cors')(app);
 app.use(express.json());
 
 // Mount school and auth APIs

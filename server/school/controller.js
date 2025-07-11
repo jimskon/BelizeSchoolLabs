@@ -4,14 +4,15 @@ const pool = require('../db');
 
 
 exports.getMoeSchools = async (req, res) => {
-  const [rows] = await pool.query('SELECT name, district, type FROM school_info ORDER BY name');
-  console.log("SCHOOLS:",rows);
-  res.json(rows);
+  const [rows] = await pool.query('SELECT code, name, district, type FROM school_info ORDER BY name');
+  // Remove duplicate codes (if any)
+  const unique = Array.from(new Map(rows.map(s => [s.code, s])).values());
+  res.json(unique);
 };
 
 exports.getMoeSchoolByName = async (req, res) => {
   const [rows] = await pool.query(
-    'SELECT * FROM moe_school_info WHERE name = ? LIMIT 1',
+    'SELECT * FROM school_info WHERE name = ? LIMIT 1',
     [req.query.name]
   );
   res.json(rows[0] || {});

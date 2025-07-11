@@ -163,12 +163,14 @@ export default function HomePage() {
     navigate('/login');
   };
 
-  const categories = ['All', ...Array.from(new Set(pictures.map(p => p.category)))];
+  // filter out null/undefined categories before building list
+  const categories = ['All', ...Array.from(new Set(pictures.map(p => p.category || '').filter(c => c !== '')))];
+
   const filteredPictures = selectedCategory === 'All' ? pictures : pictures.filter(p => p.category === selectedCategory);
 
   return (
-    <div className="container-fluid px-4">
-      <header className="bg-light py-5 text-center">
+    <div className="container-fluid px-4 homepage-background">
+      <header className="home-header py-5 text-center">
         <h1 className="display-5 fw-bold">Welcome, {schoolName}</h1>
         <p className="lead text-muted">Manage your school’s data and upload pictures below.</p>
         <button className="btn btn-primary mt-3" onClick={handleUploadClick}>Upload Picture</button>
@@ -208,7 +210,12 @@ export default function HomePage() {
           <div className="d-flex justify-content-center align-items-center mb-4">
             <label className="me-2">Filter:</label>
             <select className="form-select w-auto" value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
-              {categories.map(cat => <option key={cat} value={cat}>{cat.replace(/_/g, ' ')}</option>)}
+              {categories.map(cat => (
+                <option key={cat || 'none'} value={cat || ''}>
+                  {typeof cat === 'string' ? cat.replace(/_/g, ' ') : ''}
+                </option>
+              ))}
+
             </select>
           </div>
           <Carousel>
@@ -222,7 +229,7 @@ export default function HomePage() {
                   onClick={() => { setModalPic(pic); setShowModal(true); }}
                 />
                 <Carousel.Caption>
-                  <h5 className="text-capitalize">{pic.category.replace(/_/g, ' ')}</h5>
+                  <h5 className="text-capitalize">{typeof pic.category === 'string' ? pic.category.replace(/_/g, ' ') : ''}</h5>
                   <p>{pic.description}</p>
                 </Carousel.Caption>
               </Carousel.Item>
@@ -234,26 +241,30 @@ export default function HomePage() {
       <section className="my-5">
         <h2 className="mb-4">Your School Data</h2>
         <div className="row g-4">
-          {tables.map(({ table, status, lastUpdated }) => (
-            <div key={table} className="col-sm-6 col-md-4 col-lg-3">
-              <div className="card h-100">
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title text-capitalize">{table.replace(/_/g, ' ')}</h5>
-                  <p className="card-text mb-2">
-                    <span className={`badge me-2 ` +
-                      (status === 'Input complete' ? 'bg-success' :
-                        status === 'Required fields complete' ? 'bg-warning text-dark' :
-                          status === 'In progress' ? 'bg-info text-dark' :
-                            status === 'Not started' ? 'bg-secondary' : 'bg-secondary')}>{status}</span>
-                    <small className="text-muted">{lastUpdated ? new Date(lastUpdated).toLocaleDateString() : '—'}</small>
-                  </p>
-                  <button className="btn btn-outline-primary mt-auto" onClick={() => navigate(`/${table}/edit`)}>
-                    Edit
-                  </button>
+          {tables
+            .filter(t => t && typeof t.table === 'string' && t.table)
+            .map(({ table, status, lastUpdated }) => (
+              <div key={table || status} className="col-sm-6 col-md-4 col-lg-3">
+                <div className="card h-100">
+                  <div className="card-body d-flex flex-column">
+                    <h5 className="card-title text-capitalize">
+                      {typeof table === 'string' && table ? table.replace(/_/g, ' ') : 'No Table Name'}
+                    </h5>
+                    <p className="card-text mb-2">
+                      <span className={`badge me-2 ` +
+                        (status === 'Input complete' ? 'bg-success' :
+                          status === 'Required fields complete' ? 'bg-warning text-dark' :
+                            status === 'In progress' ? 'bg-info text-dark' :
+                              status === 'Not started' ? 'bg-secondary' : 'bg-secondary')}>{status}</span>
+                      <small className="text-muted">{lastUpdated ? new Date(lastUpdated).toLocaleDateString() : '—'}</small>
+                    </p>
+                    <button className="btn btn-outline-primary mt-auto" onClick={() => navigate(`/${table}/edit`)}>
+                      Edit
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
 

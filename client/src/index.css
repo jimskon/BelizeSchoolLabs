@@ -13,6 +13,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Custom homepage and navbar styles */
+.navbar-custom { background: linear-gradient(90deg, #4e54c8, #8f94fb) !important; }
+.homepage-background { margin-top: 70px; background: linear-gradient(180deg, #f0f4f8, #d9e2ec); min-height: calc(100vh - 70px); }
+.home-header { background: url('https://source.unsplash.com/1600x900/?school') no-repeat center/cover; background-size: cover; color: black !important; }
+.home-header .btn-primary { background-color: #4e54c8; border: none; }
+.home-header .btn-primary:hover { background-color: #3b3f99; }
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -52,6 +59,7 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
 
 @media (prefers-color-scheme: light) {
   :root {

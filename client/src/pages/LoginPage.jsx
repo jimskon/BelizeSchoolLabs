@@ -8,14 +8,17 @@ export default function LoginPage() {
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [selectedSchool, setSelectedSchool] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showCorrectionForm, setShowCorrectionForm] = useState(false);
   const [correctedEmail, setCorrectedEmail] = useState('');
   const [correctedName, setCorrectedName] = useState('');
   const [correctedPhone, setCorrectedPhone] = useState('');
   const [moeEmail, setMoeEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const [pinSentAt, setPinSentAt] = useState(null);
+  const [timer, setTimer] = useState(0);
+    const [isRequesting, setIsRequesting] = useState(false);
 
   // Mask email for display: show partial local part and full domain
   const maskEmail = (email) => {
@@ -68,7 +71,13 @@ export default function LoginPage() {
   };
 
   const handleSendPasswordEmail = async () => {
+    const now = Date.now();
+    if (pinSentAt && now - pinSentAt < 5 * 60 * 1000) {
+      alert('PIN has already been sent, you can resend after 5 minutes');
+      return;
+    }
     try {
+      setIsRequesting(true);
       const res = await fetch(`${API_BASE_URL}/api/auth/send-login-pin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -77,14 +86,24 @@ export default function LoginPage() {
       const result = await res.json();
       if (result.success) {
         alert('PIN has been sent to ' + moeEmail);
+        setPinSentAt(now);
+        setTimer(5 * 60);
       } else {
         alert(result.error || 'Failed to send PIN');
       }
     } catch (err) {
       console.error('Error sending PIN email:', err);
       alert('An error occurred while sending the email.');
+    } finally {
+      setIsRequesting(false);
     }
   };
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => setTimer(t => t - 1), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
 
   const handleSubmitCorrection = async () => {
     try {
@@ -167,9 +186,11 @@ export default function LoginPage() {
                     <button
                       className="btn btn-secondary"
                       onClick={handleSendPasswordEmail}
-                      disabled={!moeEmail}
+                      disabled={!moeEmail || isRequesting}
                     >
-                      Email the PIN
+                      {timer > 0
+                        ? `Resend PIN in ${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, '0')}`
+                        : 'Email the PIN'}
                     </button>
                   </div>
 

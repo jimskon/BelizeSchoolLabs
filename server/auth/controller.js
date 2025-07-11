@@ -10,7 +10,7 @@ exports.sendLoginPin = async (req, res) => {
     let emailTo = null;
     let codeTo = null;
     const [[moeRow]] = await db.query(
-      'SELECT email, code FROM moe_school_info WHERE name = ?',
+      'SELECT email, code FROM school_info WHERE name = ?',
       [school_name]
     );
     if (moeRow && moeRow.email) {

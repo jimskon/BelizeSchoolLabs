@@ -9,7 +9,7 @@ const ALLOWED_TABLES = [
   'curriculum',
   'computerRoom',
   'resources',
-  'pictures',
+  'pictures'
 ];
 
 // Validate table parameter
@@ -90,6 +90,13 @@ router.post('/:table', async (req, res) => {
     if (data[key] === 'Yes') data[key] = 1;
     else if (data[key] === 'No') data[key] = 0;
   });
+  // Convert empty strings to null
+  Object.keys(data).forEach((key) => {
+    if (data[key] === '') {
+      data[key] = null;
+    }
+  });
+
 
   const code = data.code;
   if (!code) {
@@ -97,7 +104,7 @@ router.post('/:table', async (req, res) => {
   }
 
   // Exclude read-only and admin_comments
-  const excluded = ['school_id','id','code', 'created_at', 'updated_at', 'verified_at', 'admin_comments'];
+  const excluded = ['school_id', 'id', 'code', 'created_at', 'updated_at', 'verified_at', 'admin_comments'];
   const [colsResult] = await db.query(`SHOW COLUMNS FROM ??`, [table]);
   const validColumns = colsResult.map(col => col.Field);
   const fields = Object.keys(data).filter(key => validColumns.includes(key) && !excluded.includes(key));
