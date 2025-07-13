@@ -135,7 +135,7 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	('resources',		'principals_computer',	'Does the principal have a non-rented good working computer?',				'dropdown',		'Yes,No',	6,1,1),
 	('resources',		'number_seats', 		'How many student computer stations can your lab accommodate?',				'num',			'1,40',	6,1,1),
 	('resources',		'desktop_working',		'How many working desktop computers does your main school lab / room have?','num',			'1,40',	6,1,1),
-	('resources',		'desktop_not_working',	'How many non-working desktops do you have? Some people have reported a non-working desktop when the problem is the keyboard or mouse.','num',			'(0-40)',	6,1,1),
+	('resources',		'desktop_not_working',	'How many non-working desktops do you have? Some people have reported a non-working desktop when the problem is the keyboard or mouse.','num',			'0,40)',	6,1,1),
 
 	-- has been that the monitor, keyboard or mouse is what is actually broken. Please report here the actual desktop.
 
