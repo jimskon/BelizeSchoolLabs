@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Modal, Button, Carousel } from 'react-bootstrap';
 import axios from 'axios';
 
+
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export default function HomePage() {
@@ -56,7 +57,6 @@ export default function HomePage() {
       console.error('Failed to load pictures', err);
     }
   };
-
 
   const handleUploadClick = () => {
     setShowUpload(true);
@@ -251,11 +251,13 @@ export default function HomePage() {
                       {typeof table === 'string' && table ? table.replace(/_/g, ' ') : 'No Table Name'}
                     </h5>
                     <p className="card-text mb-2">
-                      <span className={`badge me-2 ` +
-                        (status === 'Input complete' ? 'bg-success' :
+                      <span className={`badge me-2 fw-bold ` +
+                        (status === 'Input complete' ? 'bg-success text-white' :
                           status === 'Required fields complete' ? 'bg-warning text-dark' :
                             status === 'In progress' ? 'bg-info text-dark' :
-                              status === 'Not started' ? 'bg-secondary' : 'bg-secondary')}>{status}</span>
+                              status === 'Not started' ? 'bg-secondary' : 'bg-secondary')}>
+                        {status === 'Input complete' ? 'complete' : status}
+                      </span>
                       <small className="text-muted">{lastUpdated ? new Date(lastUpdated).toLocaleDateString() : '—'}</small>
                     </p>
                     <button className="btn btn-outline-primary mt-auto" onClick={() => navigate(`/${table}/edit`)}>

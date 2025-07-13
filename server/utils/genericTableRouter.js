@@ -9,7 +9,7 @@ const ALLOWED_TABLES = [
   'curriculum',
   'computerRoom',
   'resources',
-  'pictures'
+  'pictures',
 ];
 
 // Validate table parameter
@@ -50,14 +50,20 @@ router.get('/:table', async (req, res) => {
       if (table === 'school_info') delete result.admin_comments;
       return res.json(result);
     }
-    // Build empty based on columns
+    // For 'pictures', do NOT auto-insert an empty row
+    if (table === 'pictures') {
+      return res.json({});
+    }
+    // Build empty based on columns for other tables
     const [cols] = await db.query(`SHOW COLUMNS FROM ??`, [table]);
     const emptyRow = {};
     cols.forEach(col => {
       const f = col.Field;
       if (f === 'code') {
         emptyRow[f] = code;
-      } else if (['code', 'created_at', 'updated_at', 'verified_at', 'admin_comments'].includes(f)) {
+      } else if ([
+        'code', 'created_at', 'updated_at', 'verified_at', 'admin_comments'
+      ].includes(f)) {
         // skip auto or admin fields
       } else {
         emptyRow[f] = null;

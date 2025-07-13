@@ -3,7 +3,7 @@ const router = express.Router();
 const { getTableStatus } = require('../utils/getTableStatus');
 const db = require('../db');
 
-const TABLES_TO_CHECK = ['school_info', 'demographics', 'curriculum', 'computerRoom', 'resources','pictures'];
+const TABLES_TO_CHECK = ['school_info', 'demographics', 'curriculum', 'computerRoom', 'resources'];
 
 // GET status for a school by code
 router.get('/status/:code', async (req, res) => {
