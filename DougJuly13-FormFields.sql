@@ -215,7 +215,7 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	('resources',		'old_computers_broken',	'What do you plan to do with your broken computers and tablets?',				'text',		NULL,		12,0,1),
 
 	('resources',		'comments',				'Do you have any comments about the above information',						'text',			NULL,		12,0,1),
-	('demographics',	'admin_comments',		'Comments for admin (only seen by the admin)',								'text',			NULL,		12,0,1)
+	('resources',		'admin_comments',		'Comments for admin (only seen by the admin)',								'text',			NULL,		12,0,1)
 
 ON DUPLICATE KEY UPDATE
 	prompt = VALUES(prompt),
