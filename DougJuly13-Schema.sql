@@ -177,8 +177,8 @@ CREATE TABLE moe_school_info (
 CREATE TABLE school (
 	code VARCHAR(10) PRIMARY KEY, -- MOE's code for each school (username in WordPress)
 	name VARCHAR(80), -- Name for this school
-	password VARCHAR(50), -- Generated password/pin sent to specified email
-	password_expires_at DATETIME, -- Time that generated password expires
+	password VARCHAR(50) NULL, -- Generated password/pin sent to specified email
+	password_expires_at DATETIME NULL, -- Time that generated password expires
 	school_id INT,  -- An outside integer for use by WordPress to identify the particular school
 
 	answered_filled_out BOOLEAN,  -- Yes, Have you filled out all the answers; or No, I did not know all the answers I will have someone else help me
@@ -218,7 +218,7 @@ CREATE TABLE school_info (
 	administrator_2 VARCHAR(50), -- Alternate administrator 2 name (from MOE)
 	email_1 VARCHAR(50), -- Alternate administrator 1 email address (not from MOE)
 	email_2 VARCHAR(50), -- Alternate administrator 2 email address (not from MOE)
-	discription TEXT, -- Discription of your school that a potential visitor or donor would like to know
+	description TEXT, -- Description of your school that a potential visitor or donor would like to know
 
 	comments TEXT,  -- Do you have any comments about the above information
 	admin_comments TEXT, -- (Only seen by the administrator)
