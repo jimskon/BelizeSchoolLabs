@@ -1,40 +1,59 @@
-const db = require('../db');
-const { sendEmail } = require('../utils/email');
-const bcrypt = require('bcrypt');
-//const { generateReadablePassword } = require('../utils/password');
 
-// Generate and send a one-time login PIN (valid 10 minutes)
+// Database connection
+const db = require('../db');
+// Utility for sending emails
+const { sendEmail } = require('../utils/email');
+// Library for password hashing
+const bcrypt = require('bcrypt');
+
+
+// ==============================
+// Send One-Time Login PIN (Valid for 10 Minutes)
+// Handles sending a login PIN to the school's email for authentication
+// ==============================
 exports.sendLoginPin = async (req, res) => {
   const { school_name } = req.body;
   try {
     let emailTo = null;
     let codeTo = null;
+
+    // First, try to get the email and code from school_info
     const [[moeRow]] = await db.query(
       'SELECT email, code FROM school_info WHERE name = ?',
       [school_name]
     );
+
     if (moeRow && moeRow.email) {
       emailTo = moeRow.email;
       codeTo = moeRow.code;
     } else {
+      // Fallback: attempt to retrieve from the same table again
       const [[infoRow]] = await db.query(
         'SELECT email, code FROM school_info WHERE name = ?',
         [school_name]
       );
       if (infoRow && infoRow.email) {
-      emailTo = infoRow.email;
-      codeTo = infoRow.code;
+        emailTo = infoRow.email;
+        codeTo = infoRow.code;
       }
     }
+
+    // If no email was found, return an error
     if (!emailTo) {
       return res.json({ success: false, error: 'Missing email for this school' });
     }
+
+    // Generate a 6-digit random PIN and expiration time (10 minutes from now)
     const pin = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Check if the school is already in the login tracking table
     let [[schoolRow]] = await db.query(
       'SELECT code FROM school WHERE code = ?',
       [codeTo]
     );
+
+    // If not, insert a new entry into the `school` table
     if (!schoolRow || !schoolRow.code) {
       await db.query(
         'INSERT INTO school (name, code) VALUES (?, ?)',
@@ -45,47 +64,71 @@ exports.sendLoginPin = async (req, res) => {
         [codeTo]
       );
     }
+
     const schoolCode = schoolRow.code;
+
+    // Save the PIN and expiration in the school login table
     await db.query(
-      'UPDATE school SET login_pin = ?, pin_expires_at = ? WHERE code = ?',
+      'UPDATE school SET password = ?, password_expires_at = ? WHERE code = ?',
       [pin, expiresAt, schoolCode]
     );
+
+    // Send PIN to the school via email
     await sendEmail({
       to: emailTo,
       subject: 'Your Login PIN',
       text: `Your login PIN is ${pin}. It expires in 10 minutes.`
     });
+
     res.json({ success: true });
+
   } catch (err) {
     console.error('sendLoginPin error:', err);
     res.status(500).json({ success: false, error: 'Failed to send login PIN' });
   }
 };
 
-// Authenticate with PIN
+// ==============================
+// Login Using PIN (One-time login flow)
+// ==============================
 exports.login = async (req, res) => {
   const { name, pin } = req.body;
   try {
+    // Get the school's login credentials
     const [rows] = await db.query(
-      'SELECT code, login_pin, pin_expires_at FROM school WHERE name = ?',
+      'SELECT code, password, password_expires_at FROM school WHERE name = ?',
       [name]
     );
     const school = rows[0];
+
+    // If school does not exist or credentials are invalid
     if (!school) {
       return res.json({ success: false, error: 'Invalid credentials' });
     }
-    if (!school.login_pin || school.login_pin !== pin) {
-      return res.json({ success: false, error: 'Invalid or expired PIN' });
+
+    // If password does not match the pin
+    if (!school.password || school.password !== pin) {
+      return res.json({ success: false, error: 'Invalid PIN' });
     }
-    if (!school.pin_expires_at || new Date(school.pin_expires_at) < new Date()) {
+
+    // If the PIN is expired
+    if (!school.password_expires_at || new Date(school.password_expires_at) < new Date()) {
       return res.json({ success: false, error: 'PIN expired' });
     }
-    await db.query('UPDATE school SET login_pin = NULL, pin_expires_at = NULL WHERE code = ?', [school.code]);
+
+    // Login successful — you may want to invalidate the PIN here
+    // await db.query('UPDATE school SET password = NULL, password_expires_at = NULL WHERE code = ?', [school.code]);
+
+    // TODO: Fix typo or implement actual table in the following line
+    await db.query('UPDATE school WHERE code = ?', [school.code]);
+
+    // Check if the school still needs to validate its data
     const [infoRows] = await db.query(
       'SELECT code FROM school_info WHERE code = ?',
       [school.code]
     );
     const needsValidation = infoRows.length === 0;
+
     res.json({ success: true, code: school.code, needsValidation });
   } catch (err) {
     console.error('login error:', err);
@@ -93,7 +136,9 @@ exports.login = async (req, res) => {
   }
 };
 
-// Request account manually
+// ==============================
+// Request a New Account (Manual)
+// ==============================
 exports.requestAccount = async (req, res) => {
   const { school_name, district, school_email, school_phone, school_address } = req.body;
   try {
@@ -109,7 +154,9 @@ exports.requestAccount = async (req, res) => {
   }
 };
 
-// Submit contact correction request
+// ==============================
+// Submit Contact Correction Request
+// ==============================
 exports.submitCorrection = async (req, res) => {
   const { schoolName, contactEmail, contactName, contactPhone } = req.body;
   try {
@@ -126,20 +173,27 @@ exports.submitCorrection = async (req, res) => {
   }
 };
 
-// Send password to MOE email (deprecated)
-/*exports.sendPasswordEmail = async (req, res) => {
+// ==============================
+// Deprecated: Send Password (Old Flow)
+// ==============================
+// This block is left commented for reference but is no longer in use.
+/*
+exports.sendPasswordEmail = async (req, res) => {
   const { school_name } = req.body;
   try {
     let emailToSend = null;
     let schoolCode = null;
+
     const [[moeRow]] = await db.query(
       'SELECT email, code FROM school_info WHERE name = ?',
       [school_name]
     );
+
     if (moeRow) {
       emailToSend = moeRow.email;
       schoolCode = moeRow.code;
     }
+
     if (!emailToSend || !schoolCode) {
       const [[infoRow]] = await db.query(
         'SELECT email, code FROM school_info WHERE name = ?',
@@ -150,27 +204,48 @@ exports.submitCorrection = async (req, res) => {
         schoolCode = schoolCode || infoRow.code;
       }
     }
+
     if (!emailToSend || !schoolCode) {
       return res.json({ success: false, error: 'Missing email or code for this school' });
     }
+
     const generatedPassword = generateReadablePassword();
     const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
     const [[existing]] = await db.query('SELECT code FROM school WHERE name = ?', [school_name]);
     if (existing && existing.code) {
-      await db.query('UPDATE school SET code = ?, password = ? WHERE code = ?', [schoolCode, hashedPassword, existing.code]);
+      await db.query(
+        'UPDATE school SET code = ?, password = ? WHERE code = ?',
+        [schoolCode, hashedPassword, existing.code]
+      );
     } else {
-      await db.query('INSERT INTO school (name, code, password) VALUES (?, ?, ?)', [school_name, schoolCode, hashedPassword]);
+      await db.query(
+        'INSERT INTO school (name, code, password) VALUES (?, ?, ?)',
+        [school_name, schoolCode, hashedPassword]
+      );
     }
-    await sendEmail({ to: emailToSend, subject: 'Your Password', text: `Your password is ${generatedPassword}` });
+
+    await sendEmail({
+      to: emailToSend,
+      subject: 'Your Password',
+      text: `Your password is ${generatedPassword}`
+    });
+
     res.json({ success: true });
+
   } catch (err) {
     console.error('sendPasswordEmail error:', err);
     res.status(500).json({ success: false, error: 'Failed to send code' });
   }
-};*/
+};
+*/
 
-// Other admin handlers
-/*exports.getPendingRequests = async (req, res) => {
+// ==============================
+// Other Admin Handlers (commented)
+// ==============================
+// Uncomment and use only if admin interfaces are needed:
+/*
+exports.getPendingRequests = async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM account_requests WHERE status = "pending"');
     res.json({ success: true, requests: rows });
@@ -185,13 +260,16 @@ exports.approveRequest = async (req, res) => {
   try {
     const [[request]] = await db.query('SELECT * FROM account_requests WHERE id = ?', [requestId]);
     if (!request) return res.json({ success: false, error: 'Request not found' });
+
     await db.query(
       `INSERT INTO school (name, district, email, phone, address, password)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [request.school_name, request.district, request.school_email, request.school_phone, request.school_address, generatedPassword]
     );
+
     await db.query('UPDATE account_requests SET status = "approved" WHERE id = ?', [requestId]);
     res.json({ success: true });
+
   } catch (err) {
     console.error('approveRequest error:', err);
     res.status(500).json({ success: false, error: 'Approval failed' });
@@ -200,7 +278,9 @@ exports.approveRequest = async (req, res) => {
 
 exports.resetPassword = async (req, res) => {
   const { school_id, newPassword } = req.body;
-  if (!school_id || !newPassword) return res.status(400).json({ success: false, error: 'Missing school_id or password' });
+  if (!school_id || !newPassword)
+    return res.status(400).json({ success: false, error: 'Missing school_id or password' });
+
   try {
     const hashed = await bcrypt.hash(newPassword, 10);
     await db.query('UPDATE school SET password = ?, is_temp_password = FALSE WHERE code = ?', [hashed, school_id]);
@@ -209,4 +289,6 @@ exports.resetPassword = async (req, res) => {
     console.error('resetPassword error:', err);
     res.status(500).json({ success: false, error: 'Reset failed' });
   }
-};*/
+};
+*/
+

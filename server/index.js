@@ -1,34 +1,31 @@
-// server/index.js - core API and React front-end only
+
+// Main Express server entry point for API and React front-end
 const express = require('express');
-// const cors = require('cors');
+// const cors = require('cors'); // Uncomment if using CORS directly
 const path = require('path');
-const multer = require('multer');
+const multer = require('multer'); // For handling file uploads
 
 
 require('dotenv').config();
 
+
 const app = express();
+// Apply CORS middleware
 require('./cors')(app);
+// Parse JSON request bodies
 app.use(express.json());
 
-// Mount school and auth APIs
+
+// Mount all API routes
 app.use('/api/school', require('./school/routes'));
 app.use('/api/auth', require('./auth/routes'));
 app.use('/api/request', require('./request/routes'));
-
-// Dashboard routes for school data status
 app.use('/api/school', require('./dashboard/routes'));
-
-// Form configuration
 app.use('/api/form-config', require('./utils/formConfigRouter'));
-
-// Pictures routes
 app.use('/api/pictures', require('./pictures/routes'));
-
-// Generic table router for CRUD
 app.use('/api', require('./utils/genericTableRouter'));
 
-// Test DB connectivity
+// Endpoint to test DB connectivity
 app.get('/api/test-db', async (req, res) => {
   const pool = require('./db');
   try {
@@ -41,13 +38,15 @@ app.get('/api/test-db', async (req, res) => {
 
 // Serve static React build
 
+
 // Setup file storage for uploads
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
-// Serve uploads directory
+// Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Picture upload endpoint
+// Handles file upload and inserts picture metadata into the database
 app.post('/api/pictures/upload', upload.single('file'), async (req, res) => {
   try {
     const { code, category, description } = req.body;

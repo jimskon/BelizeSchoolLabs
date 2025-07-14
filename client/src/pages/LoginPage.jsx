@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SchoolSelector from '../components/SchoolSelector';
 
+// Load API URL from environment
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export default function LoginPage() {
+  // =====================
+  // State declarations
+  // =====================
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [selectedSchool, setSelectedSchool] = useState('');
@@ -15,29 +19,28 @@ export default function LoginPage() {
   const [correctedPhone, setCorrectedPhone] = useState('');
   const [moeEmail, setMoeEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [pinSentAt, setPinSentAt] = useState(null); // Track last PIN send time
+  const [timer, setTimer] = useState(0); // Cooldown timer for resending PIN
+  const [isRequesting, setIsRequesting] = useState(false);
   const navigate = useNavigate();
-  const [pinSentAt, setPinSentAt] = useState(null);
-  const [timer, setTimer] = useState(0);
-    const [isRequesting, setIsRequesting] = useState(false);
 
-  // Mask email for display: show partial local part and full domain
+  // Helper to mask email for display (e.g., j***e@email.com)
   const maskEmail = (email) => {
     const [local, domain] = email.split('@');
     if (!domain) return email;
     if (local.length <= 2) return '*@' + domain;
-    const start = local[0];
-    const end = local[local.length - 1];
-    return `${start}***${end}@${domain}`;
+    return `${local[0]}***${local[local.length - 1]}@${domain}`;
   };
 
+  // =====================
+  // Fetch MOE email on school selection
+  // =====================
   useEffect(() => {
     async function fetchMoeEmail() {
       setMoeEmail('');
       if (!selectedSchool) return;
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/api/school/moe-school?name=${encodeURIComponent(selectedSchool)}`
-        );
+        const res = await fetch(`${API_BASE_URL}/api/school/moe-school?name=${encodeURIComponent(selectedSchool)}`);
         const data = await res.json();
         setMoeEmail(data.email || '');
       } catch (err) {
@@ -47,6 +50,9 @@ export default function LoginPage() {
     fetchMoeEmail();
   }, [selectedSchool]);
 
+  // =====================
+  // Handle login logic
+  // =====================
   const handleLogin = async () => {
     setError('');
     const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
@@ -58,6 +64,8 @@ export default function LoginPage() {
     if (res.ok && data.success) {
       const schoolSession = { name: selectedSchool, code: data.code };
       localStorage.setItem('school', JSON.stringify(schoolSession));
+
+      // Redirect depending on backend flag
       if (data.needsValidation) {
         navigate(`/validate?name=${encodeURIComponent(selectedSchool)}`);
       } else if (data.needsPasswordReset) {
@@ -66,16 +74,20 @@ export default function LoginPage() {
         navigate('/main');
       }
     } else {
-      setError(data.error || 'Login failed. Please check your credentials.');
+      setError(data.error || 'Login failed. Please check your PIN');
     }
   };
 
+  // =====================
+  // Handle sending login PIN
+  // =====================
   const handleSendPasswordEmail = async () => {
     const now = Date.now();
-    if (pinSentAt && now - pinSentAt < 5 * 60 * 1000) {
-      alert('PIN has already been sent, you can resend after 5 minutes');
+    if (pinSentAt && now - pinSentAt < 60000) {
+      alert('A new PIN has already been sent. Try again in a minute.');
       return;
     }
+
     try {
       setIsRequesting(true);
       const res = await fetch(`${API_BASE_URL}/api/auth/send-login-pin`, {
@@ -83,21 +95,24 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ school_name: selectedSchool })
       });
+
       const result = await res.json();
       if (result.success) {
-        alert('PIN has been sent to ' + moeEmail);
+        alert('A new PIN has been sent to ' + moeEmail);
         setPinSentAt(now);
-        setTimer(5 * 60);
+        setTimer(300); // 5 minutes cooldown
       } else {
-        alert(result.error || 'Failed to send PIN');
+        alert(result.error || 'Failed to send the PIN via Email');
       }
     } catch (err) {
-      console.error('Error sending PIN email:', err);
-      alert('An error occurred while sending the email.');
+      console.error('Error sending the new PIN:', err);
+      alert('An error occurred while sending the Email.');
     } finally {
       setIsRequesting(false);
     }
   };
+
+  // Countdown timer for resend cooldown
   useEffect(() => {
     if (timer > 0) {
       const interval = setInterval(() => setTimer(t => t - 1), 1000);
@@ -105,6 +120,9 @@ export default function LoginPage() {
     }
   }, [timer]);
 
+  // =====================
+  // Handle contact correction form submission
+  // =====================
   const handleSubmitCorrection = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/correct-contact`, {
@@ -119,26 +137,30 @@ export default function LoginPage() {
       });
       const result = await res.json();
       if (result.success) {
-        alert('Your correction request has been submitted.');
+        alert('The correction request has been submitted.');
         setShowCorrectionForm(false);
       } else {
-        alert(result.error || 'Failed to submit correction.');
+        alert(result.error || 'Failed to submit the correction request.');
       }
     } catch (err) {
-      console.error('Error submitting correction:', err);
-      alert('An error occurred while submitting the correction.');
+      console.error('Error submitting the correction request:', err);
+      alert('An error occurred while submitting the correction request.');
     }
   };
 
+  // =====================
+  // JSX Render
+  // =====================
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className="card shadow-sm">
             <div className="card-header bg-primary text-white">
-              <h4 className="mb-0 text-center">School Login</h4>
+              <h4 className="mb-0 text-center">Login</h4>
             </div>
             <div className="card-body">
+              {/* School selector dropdowns */}
               <SchoolSelector
                 selectedDistrict={selectedDistrict}
                 setSelectedDistrict={setSelectedDistrict}
@@ -148,18 +170,21 @@ export default function LoginPage() {
                 setSelectedSchool={setSelectedSchool}
               />
 
+              {/* No school selected message */}
               {!selectedSchool && (
                 <div className="alert alert-info mt-3">
                   Please select a district, type, and school to continue.
                 </div>
               )}
 
+              {/* Login form if school selected */}
               {selectedSchool && (
                 <>
                   <div className="mb-3">
                     <label className="form-label fw-semibold">PIN</label>
                     <input
                       type="password"
+                      style={{ width: '10ch' }}
                       className="form-control"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -176,11 +201,12 @@ export default function LoginPage() {
 
                   {error && <div className="alert alert-danger mt-3">{error}</div>}
 
+                  {/* PIN resend section */}
                   <div className="mt-4">
                     <p>
-                      Send your School's PIN to this email address:{' '}
+                      If you do not have a valid PIN we can Email a new one to: {' '}
                       <strong>
-                        {moeEmail ? maskEmail(moeEmail) : 'xx@xx.xx'}
+                        {moeEmail ? maskEmail(moeEmail) : ' ERROR - No Email found, please submit correction'}
                       </strong>
                     </p>
                     <button
@@ -190,14 +216,13 @@ export default function LoginPage() {
                     >
                       {timer > 0
                         ? `Resend PIN in ${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, '0')}`
-                        : 'Email the PIN'}
+                        : 'Email a new PIN'}
                     </button>
                   </div>
 
+                  {/* Correction request option */}
                   <div className="mt-3">
-                    <p>
-                      If the above email is invalid, kindly request to correct this email address
-                    </p>
+                    <p>If the above Email is incorrect, please request an update:</p>
                     <button
                       className="btn btn-secondary"
                       onClick={() => setShowCorrectionForm(true)}
@@ -206,11 +231,12 @@ export default function LoginPage() {
                     </button>
                   </div>
 
+                  {/* Correction request form */}
                   {showCorrectionForm && (
                     <div className="mt-3">
                       <div className="mb-3">
                         <label className="form-label">
-                          School’s contact person’s corrected email
+                          School’s contact person’s Email address
                         </label>
                         <input
                           type="email"
@@ -220,9 +246,7 @@ export default function LoginPage() {
                         />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label">
-                          School’s contact person’s name
-                        </label>
+                        <label className="form-label">Contact person's name</label>
                         <input
                           type="text"
                           className="form-control"
@@ -231,9 +255,7 @@ export default function LoginPage() {
                         />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label">
-                          School’s contact person’s WhatsApp phone number (someone will be contacting you)
-                        </label>
+                        <label className="form-label">WhatsApp phone number</label>
                         <input
                           type="text"
                           className="form-control"
@@ -242,7 +264,7 @@ export default function LoginPage() {
                         />
                       </div>
                       <button className="btn btn-primary" onClick={handleSubmitCorrection}>
-                        Submit Email Correction Request
+                        Submit Correction Request
                       </button>
                     </div>
                   )}
