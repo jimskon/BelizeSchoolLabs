@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 13, 2025 at 09:13 PM
+-- Generation Time: Jul 13, 2025 at 09:39 PM
 -- Server version: 10.5.26-MariaDB-ubu2004
 -- PHP Version: 7.4.3-4ubuntu2.29
 
@@ -2760,6 +2760,27 @@ CREATE TABLE `titles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data for table `titles`
+--
+
+INSERT INTO `titles` (`id`, `table_name`, `title`, `subtitle`, `instructions`, `footer`) VALUES
+(1, 'school_info', 'title', 'subtitle', 'instructions', 'footer'),
+(2, 'school_info', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(3, 'demographics', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(4, 'curriculum', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(5, 'future_curriculum', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(6, 'computerRoom', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(7, 'future_computerRoom', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(8, 'resources', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(9, 'school_info', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(10, 'demographics', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(11, 'curriculum', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(12, 'future_curriculum', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(13, 'computerRoom', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(14, 'future_computerRoom', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer'),
+(15, 'resources', 'This is the Title', 'This is the Subtitle', 'These are the instructions', 'This is the footer');
+
+--
 -- Indexes for dumped tables
 --
 
@@ -2891,7 +2912,7 @@ ALTER TABLE `school_grant_status`
 -- AUTO_INCREMENT for table `titles`
 --
 ALTER TABLE `titles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
