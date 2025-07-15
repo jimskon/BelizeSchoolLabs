@@ -43,9 +43,9 @@ exports.sendLoginPin = async (req, res) => {
       return res.json({ success: false, error: 'Missing email for this school' });
     }
 
-    // Generate a 6-digit random PIN and expiration time (10 minutes from now)
+    // Generate a 6-digit random PIN and expiration time (24 hours from now)
     const pin = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     // Check if the school is already in the login tracking table
     let [[schoolRow]] = await db.query(
@@ -77,7 +77,7 @@ exports.sendLoginPin = async (req, res) => {
     await sendEmail({
       to: emailTo,
       subject: 'Your Login PIN',
-      text: `Your login PIN is ${pin}. It expires in 10 minutes.`
+      text: `Your login PIN is ${pin}. It expires in 24 hours.`
     });
 
     res.json({ success: true });
@@ -118,9 +118,6 @@ exports.login = async (req, res) => {
 
     // Login successful — you may want to invalidate the PIN here
     // await db.query('UPDATE school SET password = NULL, password_expires_at = NULL WHERE code = ?', [school.code]);
-
-    // TODO: Fix typo or implement actual table in the following line
-    await db.query('UPDATE school WHERE code = ?', [school.code]);
 
     // Check if the school still needs to validate its data
     const [infoRows] = await db.query(

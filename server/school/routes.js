@@ -47,7 +47,6 @@ router.get('/validate-needed', controller.getValidationPrefillData);
 // Returns success with the newly created school ID.
 router.post('/validate', controller.validateAndCreateSchool);
 
-// ==============================
+
 // Export the router to be mounted in the main app
-// ==============================
 module.exports = router;

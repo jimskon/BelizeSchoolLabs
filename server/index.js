@@ -19,7 +19,7 @@ app.use(express.json());
 // Mount all API routes
 app.use('/api/school', require('./school/routes'));
 app.use('/api/auth', require('./auth/routes'));
-app.use('/api/request', require('./request/routes'));
+// app.use('/api/request', require('./request/routes'));
 app.use('/api/school', require('./dashboard/routes'));
 app.use('/api/form-config', require('./utils/formConfigRouter'));
 app.use('/api/pictures', require('./pictures/routes'));

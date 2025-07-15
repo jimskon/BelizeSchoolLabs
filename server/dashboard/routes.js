@@ -1,16 +1,15 @@
 // server/status/router.js
 
-// =====================================
 // Import Dependencies
-// =====================================
+
 const express = require('express');
 const router = express.Router();
 const { getTableStatus } = require('../utils/getTableStatus'); // Utility to calculate table completion status
 const db = require('../db');
 
-// =====================================
+
+
 // List of Tables to Check for Progress
-// =====================================
 // These are the core form sections that schools are expected to complete.
 // Each table represents a logical part of a school’s profile.
 const TABLES_TO_CHECK = [
@@ -18,12 +17,12 @@ const TABLES_TO_CHECK = [
   'demographics',
   'curriculum',
   'computerRoom',
-  'resources'
+  'resources',
+  'future_computerRoom',
 ];
 
-// =====================================
+
 // GET /status/:code
-// =====================================
 // Returns a progress status report for each relevant table tied to a given school `code`.
 // Also includes the most recent `updated_at` timestamp for each section.
 // This endpoint powers a dashboard or school progress tracker.

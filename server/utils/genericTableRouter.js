@@ -16,6 +16,7 @@ const ALLOWED_TABLES = [
   'computerRoom',
   'resources',
   'pictures',
+  'future_computerRoom'
 ];
 
 // ==========================
@@ -70,10 +71,8 @@ router.get('/:table', async (req, res) => {
     );
 
     if (rows.length > 0) {
-      const result = rows[0];
-      // Hide internal admin comments from users (for UI purposes)
-      if (table === 'school_info') delete result.admin_comments;
-      return res.json(result);
+    const result = rows[0];
+    return res.json(result);
     }
 
     // If no record exists:
@@ -91,9 +90,9 @@ router.get('/:table', async (req, res) => {
       if (f === 'code') {
         emptyRow[f] = code;
       } else if ([
-        'code', 'created_at', 'updated_at', 'verified_at', 'admin_comments'
+        'code', 'created_at', 'updated_at', 'verified_at'
       ].includes(f)) {
-        // Skip internal/system-managed fields
+        // Skip internal/system-managed fields (but NOT admin_comments)
       } else {
         emptyRow[f] = null;
       }
@@ -149,7 +148,7 @@ router.post('/:table', async (req, res) => {
   // Define fields to exclude from update/insert operations
   const excluded = [
     'school_id', 'id', 'code', 'created_at',
-    'updated_at', 'verified_at', 'admin_comments'
+    'updated_at', 'verified_at'
   ];
 
   // Retrieve valid column names from the table schema

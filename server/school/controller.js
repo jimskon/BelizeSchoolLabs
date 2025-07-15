@@ -2,9 +2,7 @@
 
 const pool = require('../db');
 
-// =======================================
 // GET /api/moe-schools
-// =======================================
 // Fetches all schools from `school_info`.
 // Removes duplicate entries based on `code` before returning.
 exports.getMoeSchools = async (req, res) => {
@@ -19,9 +17,7 @@ exports.getMoeSchools = async (req, res) => {
   res.json(unique);
 };
 
-// =======================================
 // GET /api/moe-school-by-name?name=XYZ
-// =======================================
 // Retrieves a specific school's full record by name from `school_info`.
 // If not found, returns an empty object.
 exports.getMoeSchoolByName = async (req, res) => {
@@ -32,9 +28,9 @@ exports.getMoeSchoolByName = async (req, res) => {
   res.json(rows[0] || {});
 };
 
-// =======================================
+
+
 // POST /api/validate-and-create-school
-// =======================================
 // Validates submitted school data, then creates a new entry in:
 //   1. `school` (basic login info)
 //   2. `school_info` (detailed MOE data)
@@ -108,9 +104,10 @@ exports.validateAndCreateSchool = async (req, res) => {
   }
 };
 
-// =======================================
+
+
+
 // GET /api/validation-prefill?name=XYZ
-// =======================================
 // Pulls default MOE record from `moe_school_info`
 // to prefill form fields for easier validation.
 exports.getValidationPrefillData = async (req, res) => {

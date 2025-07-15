@@ -19,8 +19,7 @@ export default function LoginPage() {
   const [correctedPhone, setCorrectedPhone] = useState('');
   const [moeEmail, setMoeEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [pinSentAt, setPinSentAt] = useState(null); // Track last PIN send time
-  const [timer, setTimer] = useState(0); // Cooldown timer for resending PIN
+  const [pinDisabled, setPinDisabled] = useState(false); // Disable PIN button for 60s
   const [isRequesting, setIsRequesting] = useState(false);
   const navigate = useNavigate();
 
@@ -82,11 +81,7 @@ export default function LoginPage() {
   // Handle sending login PIN
   // =====================
   const handleSendPasswordEmail = async () => {
-    const now = Date.now();
-    if (pinSentAt && now - pinSentAt < 60000) {
-      alert('A new PIN has already been sent. Try again in a minute.');
-      return;
-    }
+
 
     try {
       setIsRequesting(true);
@@ -99,8 +94,8 @@ export default function LoginPage() {
       const result = await res.json();
       if (result.success) {
         alert('A new PIN has been sent to ' + moeEmail);
-        setPinSentAt(now);
-        setTimer(300); // 5 minutes cooldown
+        setPinDisabled(true);
+        setTimeout(() => setPinDisabled(false), 60000); // 60 seconds
       } else {
         alert(result.error || 'Failed to send the PIN via Email');
       }
@@ -112,13 +107,7 @@ export default function LoginPage() {
     }
   };
 
-  // Countdown timer for resend cooldown
-  useEffect(() => {
-    if (timer > 0) {
-      const interval = setInterval(() => setTimer(t => t - 1), 1000);
-      return () => clearInterval(interval);
-    }
-  }, [timer]);
+
 
   // =====================
   // Handle contact correction form submission
@@ -212,11 +201,9 @@ export default function LoginPage() {
                     <button
                       className="btn btn-secondary"
                       onClick={handleSendPasswordEmail}
-                      disabled={!moeEmail || isRequesting}
+                      disabled={!moeEmail || isRequesting || pinDisabled}
                     >
-                      {timer > 0
-                        ? `Resend PIN in ${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, '0')}`
-                        : 'Email a new PIN'}
+                      Email a new PIN
                     </button>
                   </div>
 

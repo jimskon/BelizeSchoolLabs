@@ -28,16 +28,19 @@ export default function HomePage() {
   // =========================
   // Load school data and statuses on mount
   // =========================
-  useEffect(() => {
-    const schoolData = JSON.parse(localStorage.getItem('school'));
-    if (schoolData && schoolData.code) {
-      setSchoolName(schoolData.name);
-      fetchTableStatus(schoolData.code);
-      fetchPictures();
-    } else {
-      navigate('/login');
-    }
-  }, [navigate]);
+// On component mount, load school data from localStorage.
+// If a valid school is found, set the school name, fetch table status, and load pictures.
+// If not, redirect to the login page.
+useEffect(() => {
+  const schoolData = JSON.parse(localStorage.getItem('school'));
+  if (schoolData && schoolData.code) {
+    setSchoolName(schoolData.name);
+    fetchTableStatus(schoolData.code);
+    fetchPictures();
+  } else {
+    navigate('/login');
+  }
+}, [navigate]);
 
   // Fetch form section completion statuses
   const fetchTableStatus = async (code) => {
