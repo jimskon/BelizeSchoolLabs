@@ -533,16 +533,17 @@ CREATE TABLE form_fields (
 CREATE TABLE contact_corrections (
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	code VARCHAR(10), -- MOE's code for each school
-	school_name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+	school_name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
 	district ENUM ('Belize', 'Cayo', 'Corozal', 'Orange Walk', 'Stann Creek', 'Toledo'),
 	type ENUM ('Preschool', 'Primary', 'Secondary', 'Tertiary', 'Vocational', 'Adult and Continuing', 'University'),
 
-	contact_email VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+	contact_email VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
 	contact_name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
 	contact_phone VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
 	status ENUM('pending', 'approved', 'rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pending',
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	);
 
 -- Table to hold title, subtitle, etc. for a edit information on question pages
 
