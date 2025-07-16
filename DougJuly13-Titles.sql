@@ -51,7 +51,7 @@ INSERT INTO titles (table_name, title, subtitle, instructions, footer) VALUES
 		'This is the footer')
 
 
-	('correction_requests', 'This is the Title',
+	('contact_corrections', 'This is the Title',
 
 		'This is the Subtitle',
 		'These are the instructions',
