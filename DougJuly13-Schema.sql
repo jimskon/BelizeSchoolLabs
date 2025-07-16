@@ -554,6 +554,7 @@ CREATE TABLE titles (
 	subtitle TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
 	instructions TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
 	footer TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	visible TINYINT(1) DEFAULT NULL,
 	PRIMARY KEY (id)
 );
 
