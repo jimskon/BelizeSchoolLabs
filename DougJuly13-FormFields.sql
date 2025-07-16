@@ -30,7 +30,8 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	('school_info',		'discription',					"Discription of your school that a potential visitor or donor would like to know", 'text',			NULL,		12,0,1),	
 	('school_info',		'comments',						'Comments about the above intormation',			'text',			NULL,		12,0,1),
 	('school_info',		'admin_comments',				'Comments for admin (only seen by the admin)',	'text',			NULL,		12,0,1),	
-
+	('school_info',		'verified',					'I verify that this information is correct',					'dropdown',		'Yes,No',	6,1,1),
+	
 	-- demographics
 
 	('demographics',	'principals_name',				'Principal Name',								'text',			NULL,		6,1,1),
@@ -215,8 +216,21 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	('resources',		'old_computers_broken',	'What do you plan to do with your broken computers and tablets?',				'text',		NULL,		12,0,1),
 
 	('resources',		'comments',				'Do you have any comments about the above information',						'text',			NULL,		12,0,1),
-	('resources',		'admin_comments',		'Comments for admin (only seen by the admin)',								'text',			NULL,		12,0,1)
+	('resources',		'admin_comments',		'Comments for admin (only seen by the admin)',								'text',			NULL,		12,0,1),
 
+	-- Correction request fields for admin since set to not visible
+--INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_width, required, visible) VALUES
+	
+--	('contact_corrections',	'code',							'MOE School Code',						'text',			NULL,		6,1,0),
+--	('contact_corrections',	'school_name',						'School Name',							'text',			NULL,		6,1,1),
+	('contact_corrections',	'district',						'District',							'dropdown',		'Belize,Cayo,Corozal,Orange Walk,Stann Creek,Toledo',	6,1,1),
+	('contact_corrections',	'type',							'School Type',							'dropdown',		'Preschool,Primary,Secondary,Tertiary,Vocational,Adult and Continuing,University',	6,1,1),
+--	('contact_corrections',	'ownership',						'Ownership',							'dropdown',		'Adventist Schools, Anglican Schools, Assemblies Of God Schools, Baptist, Catholic Schools, Government Schools, Mennonite Schools - Church Group. Mennonite Schools - H&B, Mennonite Schools - Spanish Lookout, Methodist Schools, Nazarene Schools,Presbyterian Schools, Private Schools, U.E.C.B Schools, Other',		6,0,1),
+	('contact_corrections',	'contact_name',						'School Main Contact Person',					'text',			NULL,		6,1,1),
+	('contact_corrections',	'contact_phone',					'School Contact Persons Phone',					'phone',		NULL,		6,1,1),
+	('contact_corrections',	'contact_email',					'School Main Contact Person email',				'email',		NULL,		6,1,1)
+
+	
 ON DUPLICATE KEY UPDATE
 	prompt = VALUES(prompt),
 	type = VALUES(type),
