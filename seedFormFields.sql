@@ -107,7 +107,7 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	('curriculum',		'graphics_cad_program',			'Does your school teach graphics CAD tools such as AutoCad non-rendering or equivalent?',	'dropdown',	'Yes,No',	6,1,1),
 	('curriculum',		'robotics',						'Does your school teach robotics?',											'dropdown',	'Yes,No',	6,1,1),
 	('curriculum',		'code_dot_org',					'Does your school use code.org?',											'dropdown',	'Yes,No',	6,1,1),
-	('curriculum',		'khan_accadamy',				'Does your school use Khan Academy or similar online learning platforms?',	'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'khan_academy',					'Does your school use Khan Academy or similar online learning platforms?',	'dropdown',	'Yes,No',	6,1,1),
 	('curriculum',		'other_on_liine_local_education_tools','Other educational websites?',										'text', 	NULL,		6,0,1),
 	('curriculum',		'formal_curriculum',			'What formal computer related curriculum does your school use if any?',		'text',		NULL,		6,0,1),
 	('curriculum',		'local_curriculum',				'What locally generated computer related curriculum does your school use?',	'text',		NULL,		6,0,1),
