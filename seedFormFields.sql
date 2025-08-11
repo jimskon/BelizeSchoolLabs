@@ -103,8 +103,8 @@ INSERT INTO form_fields (table_name, field_name, prompt, type, valuelist, field_
 	('curriculum',		'cloud_based_learning_tools',	'Does your school use other learning websites such as typing, spelling, math, etc.?',							'dropdown',	'Yes,No',	6,1,1),
 	('curriculum',		'graphics_design',				'Does your school teach graphics design tools such as Photoshop, Illustrator, Publisher, Canva, PosterMyWall or equivalent?',		'dropdown','Yes,No',	6,1,1),
 
-	('curriculum',		'graphics_animation',			'Does your school teach graphics animation such as Blender or equivalent?',	'dropdown',	'Yes,No',	6,1,1),
-	('curriculum',		'graphics_cad_program',			'Does your school teach graphics CAD tools such as AutoCad or equivalent?',	'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'graphics_animation',			'Does your school teach graphics animation such as Blender, Autocad rendering or equivalent?',	'dropdown',	'Yes,No',	6,1,1),
+	('curriculum',		'graphics_cad_program',			'Does your school teach graphics CAD tools such as AutoCad non-rendering or equivalent?',	'dropdown',	'Yes,No',	6,1,1),
 	('curriculum',		'robotics',						'Does your school teach robotics?',											'dropdown',	'Yes,No',	6,1,1),
 	('curriculum',		'code_dot_org',					'Does your school use code.org?',											'dropdown',	'Yes,No',	6,1,1),
 	('curriculum',		'khan_accadamy',				'Does your school use Khan Academy or similar online learning platforms?',	'dropdown',	'Yes,No',	6,1,1),
